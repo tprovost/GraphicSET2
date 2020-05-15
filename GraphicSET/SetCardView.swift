@@ -34,7 +34,6 @@ class SetCardView: UIView {
     var backColor : UIColor = UIColor.white {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
-    
  
     private func createSymbol() -> SymbolView {
         let symbol = SymbolView()
@@ -51,41 +50,65 @@ class SetCardView: UIView {
     private func configureSymbol(theSymbol:SymbolView, origin: CGPoint) {
         theSymbol.frame = CGRect(origin: origin, size: symbolSize)
         theSymbol.isHidden = false
+//        print("Configure symbol \(theSymbol) at \(theSymbol.frame)")
+        
     }
     
 
     
     override func draw(_ rect: CGRect) {
         // Draw card background with rounded corners
-    let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+    print("--- Draw Set Card with \(self.number) symbols")
+        let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
         roundedRect.addClip()
         displayConst.cardBackground.setFill()
         roundedRect.fill()
         
-    }
-
-    private lazy var symbolToDraw: SymbolView = createSymbol()
-    private lazy var symb2  : SymbolView = createSymbol()
-    private lazy var symb3 : SymbolView = createSymbol()
-
-    
-    override func layoutSubviews() {
-           super.layoutSubviews()
+        let symbolToDraw: SymbolView = createSymbol()
+//        let symb2  : SymbolView = createSymbol()
+//        let symb3 : SymbolView = createSymbol()
         
-        switch number {
+        switch self.number {
         case 1:
             configureSymbol(theSymbol: symbolToDraw, origin: Origin2)
         case 2:
             configureSymbol(theSymbol: symbolToDraw, origin: Origin21)
+            let symb2  : SymbolView = createSymbol()
             configureSymbol(theSymbol: symb2, origin: Origin22)
         case 3:
             configureSymbol(theSymbol: symbolToDraw, origin: Origin1)
+            let symb2  : SymbolView = createSymbol()
             configureSymbol(theSymbol: symb2, origin: Origin2)
+            let symb3 : SymbolView = createSymbol()
             configureSymbol(theSymbol: symb3, origin: Origin3)
         default:
             break
         }
+        
     }
+
+//    private lazy var symbolToDraw: SymbolView = createSymbol()
+//    private lazy var symb2  : SymbolView = createSymbol()
+//    private lazy var symb3 : SymbolView = createSymbol()
+
+    
+//    override func layoutSubviews() {
+//           super.layoutSubviews()
+//
+//        switch number {
+//        case 1:
+//            configureSymbol(theSymbol: symbolToDraw, origin: Origin2)
+//        case 2:
+//            configureSymbol(theSymbol: symbolToDraw, origin: Origin21)
+//            configureSymbol(theSymbol: symb2, origin: Origin22)
+//        case 3:
+//            configureSymbol(theSymbol: symbolToDraw, origin: Origin1)
+//            configureSymbol(theSymbol: symb2, origin: Origin2)
+//            configureSymbol(theSymbol: symb3, origin: Origin3)
+//        default:
+//            break
+//        }
+
 }
 
 

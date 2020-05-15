@@ -52,12 +52,13 @@ class SymbolView: UIView {
         static let lineWidth : CGFloat = 3.0
         static let backColor : UIColor = UIColor.white
         static let stripeColor : UIColor = UIColor.green  // for testing
+        static let stripeGap : CGFloat = 6.0
     }
     
 
     override func draw(_ rect: CGRect) {
          // Drawing code
-    
+    print("------ Draw Symbol \(symbol)")
         //self.backgroundColor = symbolValues.backColor
         
         var symbolPath = UIBezierPath()
@@ -92,7 +93,13 @@ class SymbolView: UIView {
         case SymbolView.Shading.solid.rawValue:
             color.setFill()
         case SymbolView.Shading.striped.rawValue:
-            symbolValues.stripeColor.setFill()
+            var lineY : CGFloat = symbolValues.stripeGap
+            repeat {
+                symbolPath.move(to: CGPoint(x: 0.0, y: lineY))
+                symbolPath.addLine(to: CGPoint(x: bounds.width, y: lineY))
+                lineY += symbolValues.stripeGap
+            } while lineY < bounds.height
+            symbolValues.backColor.setFill()
         case SymbolView.Shading.open.rawValue:
             symbolValues.backColor.setFill()
         default:

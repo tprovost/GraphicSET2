@@ -15,16 +15,6 @@ class CardTableView: UIView {
     // a card table surface.  Will need to adjust for orientation and number of cards being
     // displayed.
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setUpCardViews()
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setUpCardViews()
-        
-    }
     
     /*
     // Only override draw() if you perform custom drawing.
@@ -45,19 +35,9 @@ class CardTableView: UIView {
     // view controller
     
     var cards = [Card]()
-    private var cardViews = [SetCardView]()
+    var cardViews = [SetCardView]()
     
-    //[Card(color: Card.ShapeColor.red
-//    , symbol: Card.Symbol.diamond, shading: Card.Shading.solid, number: 2),Card(color: Card.ShapeColor.purple
-//    , symbol: Card.Symbol.oval, shading: Card.Shading.open, number: 3))]
     
-//    private var card1 = Card(color: Card.ShapeColor.red
-//        , symbol: Card.Symbol.diamond, shading: Card.Shading.solid, number: 2)
-//    private var card2 = Card(color: Card.ShapeColor.purple
-//    , symbol: Card.Symbol.oval, shading: Card.Shading.open, number: 3)
-//
-//    private var cardView1 = SetCardView()
-//    private var cardView2 = SetCardView()
     
     private func createCardView(forCard theCard: Card) -> SetCardView {
         let cardView = SetCardView()
@@ -75,16 +55,25 @@ class CardTableView: UIView {
         cardView.backgroundColor = UIColor.clear
         cardView.contentMode = UIView.ContentMode.redraw
         addSubview(cardView)
-        cardViews.append(cardView)
         cardView.isHidden = true
-        
+        //print("Card View created: \(cardView.symbol), \(cardView.color), \(cardView.shadng), \(cardView.number)")
         return cardView
     }
     
-    private func setUpCardViews() {
-        for card in cards {
-        let _ = createCardView(forCard: card)
+    func setUpCardViews() {
+        print("--- Set up Card views")
+        for index in 0..<cards.count {
+            let newView = createCardView(forCard: cards[index])
+            cardViews.append(newView)
         }
+    }
+    
+    func clearCardViews(){
+       print("- Clear Card Views")
+        for cardView in self.subviews {
+            cardView.removeFromSuperview()
+        }
+        cardViews.removeAll()
     }
     
     private func configureAndDisplayCardView(cardView: SetCardView, atOrigin: CGPoint, withSize: CGSize) {
@@ -107,27 +96,25 @@ class CardTableView: UIView {
     private var cardGrid = Grid(layout: Grid.Layout.aspectRatio(tableConstant.aspectRatio))
     
     
-    override func draw(_ rect: CGRect) {
-//        cards.append(card1)
-//        cards.append(card2)
-        
-//        cardView1 = createCardView(forCard: card1)
-//        cardView2 = createCardView(forCard: card2)
-        }
+//    override func draw(_ rect: CGRect) {
+//
+//        // setUpCardViews()
+//
+//        cardGrid.frame = self.bounds
+//        cardGrid.cellCount = cards.count
+//
+//        for index in 0..<cards.count {
+//            if let cardPos = cardGrid[index] {
+//                configureAndDisplayCardView(cardView: cardViews[index], atPosition: cardPos)
+//            }
+//        }
+//        }
 
     override func layoutSubviews() {
         super.layoutSubviews()
         
-//        let o1 = CGPoint(x: 10.10, y: 25.0)
-//        let s1 = CGSize(width: 200, height: 80)
-//        let o2 = CGPoint(x: 50.0, y: 300)
-//        let s2 = CGSize(width: 100, height: 40)
-//
-//        configureAndDisplayCardView(cardView: cardView1, atOrigin: o1, withSize: s1)
-//        configureAndDisplayCardView(cardView: cardView2, atOrigin: o2, withSize: s2)
-        
-        setUpCardViews()
-        
+        // setUpCardViews()
+        print(" Layout Card Table")
         cardGrid.frame = self.bounds
         cardGrid.cellCount = cards.count
         
@@ -137,13 +124,5 @@ class CardTableView: UIView {
             }
         }
         
-//        var orig = CGPoint(x: 20.0, y: 50.0)
-//        let cardSize = CGSize(width: 120, height: 70)
-//
-//        for cv in cardViews {
-//            let posRect = CGRect(origin: orig, size: cardSize)
-//            configureAndDisplayCardView(cardView: cv, atPosition: posRect)
-//            orig = orig.offsetBy(dx: 10.0, dy: cardSize.height + 10.0)
-//        }
     }
 }
