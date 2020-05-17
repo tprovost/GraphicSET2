@@ -8,110 +8,117 @@
 
 import UIKit
 
-//@IBDesignable
 class SetCardView: UIView {
 
     private struct displayConst {
-        static let cardBackground : UIColor = UIColor.white
+        static let cardBackground : UIColor = symbolValues.backColor
     }
-//    @IBInspectable
     var symbol : Int = SymbolView.Symbol.diamond.rawValue {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
-//    @IBInspectable
     var shadng : Int = SymbolView.Shading.open.rawValue {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
-//    @IBInspectable
     var color : UIColor = UIColor.black {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
-//    @IBInspectable
     var number : Int = 2 {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
-//    @IBInspectable
     var backColor : UIColor = UIColor.white {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
  
-    private func createSymbol() -> SymbolView {
-        let symbol = SymbolView()
-        symbol.shading = self.shadng
-        symbol.symbol = self.symbol
-        symbol.color = self.color
-        symbol.bounds = CGRect(x: 0.0, y: 0.0, width: symbolWidth, height: symbolHeight)
-        symbol.backgroundColor = backColor
-        addSubview(symbol)
-        symbol.isHidden = true
-        return symbol
+    private struct symbolValues {
+        static let ovalCurve : CGFloat = 0.50
+        static let lineWidth : CGFloat = 3.0
+        static let backColor : UIColor = UIColor.white
+        static let stripeColor : UIColor = UIColor.green  // for testing
+        static let stripeGap : CGFloat = 6.0
     }
     
-    private func configureSymbol(theSymbol:SymbolView, origin: CGPoint) {
-        theSymbol.frame = CGRect(origin: origin, size: symbolSize)
-        theSymbol.isHidden = false
-//        print("Configure symbol \(theSymbol) at \(theSymbol.frame)")
+    private func drawSymbol(startingAt initOrigin: CGPoint, forCount number: Int) {
+        var  minX : CGFloat = initOrigin.x
+        let  minY : CGFloat = initOrigin.y
+        var  midX : CGFloat  { return minX + (symbolWidth / 2.0) }
+        var  midY : CGFloat  { return minY + (symbolHeight / 2.0) }
+        var  maxX : CGFloat  { return minX + symbolWidth }
+        let  maxY : CGFloat = minY + symbolHeight
+        
+        let symbolPath = UIBezierPath()
+        
+        if number == 1 {
+            minX += widthBetweenSymbols
+        } else if number == 2 {
+            minX = Origin21.x
+        }
+        
+        for _ in 0..<number {
+            switch symbol {
+            case Card.Symbol.diamond.rawValue:
+                symbolPath.move(to: CGPoint(x: midX, y: minY))
+                symbolPath.addLine(to: CGPoint(x: maxX, y: midY))
+                symbolPath.addLine(to: CGPoint(x: midX, y: maxY))
+                symbolPath.addLine(to: CGPoint(x: minX, y: midY))
+                symbolPath.close()
+                symbolPath.lineWidth = symbolValues.lineWidth
+            case Card.Symbol.oval.rawValue:
+                let rect = CGRect(origin: CGPoint(x: minX, y: minY), size: CGSize(width: symbolWidth, height: symbolHeight))
+                let ovalPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.size.width * symbolValues.ovalCurve)
+                symbolPath.append(ovalPath)
+            case Card.Symbol.squiggle.rawValue:
+                symbolPath.move(to: CGPoint(x: minX, y: minY))
+                symbolPath.addLine(to: CGPoint(x: minX + 0.75*symbolWidth, y: minY + 0.32*symbolHeight))
+                symbolPath.addLine(to: CGPoint(x: minX + 0.50*symbolWidth, y: minY + 0.68*symbolHeight))
+                symbolPath.addLine(to: CGPoint(x: maxX, y: maxY))
+                symbolPath.addLine(to: CGPoint(x: minX + 0.20*symbolWidth, y: minY + 0.68*symbolHeight))
+                symbolPath.addLine(to: CGPoint(x: minX + 0.32*symbolWidth, y: minY + 0.32*symbolHeight))
+                symbolPath.close()
+            default:
+                break
+            }
+            
+            minX += widthBetweenSymbols
+
+        }
+            
+           symbolPath.addClip()
+        
+            switch shadng {
+            case SymbolView.Shading.solid.rawValue:
+                color.setFill()
+            case SymbolView.Shading.striped.rawValue:
+                var lineY : CGFloat = minY + symbolValues.stripeGap
+                repeat {
+                    symbolPath.move(to: CGPoint(x: initOrigin.x, y: lineY))
+                    symbolPath.addLine(to: CGPoint(x: maxX, y: lineY))
+                    lineY += symbolValues.stripeGap
+                } while lineY < maxY
+                symbolValues.backColor.setFill()
+            case SymbolView.Shading.open.rawValue:
+                symbolValues.backColor.setFill()
+            default:
+                break
+            }
+            
+        symbolPath.lineWidth = symbolValues.lineWidth
+        color.setStroke()
+        symbolPath.fill()
+        symbolPath.stroke()
         
     }
     
-
-    
     override func draw(_ rect: CGRect) {
         // Draw card background with rounded corners
-    print("--- Draw Set Card with \(self.number) symbols")
         let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
         roundedRect.addClip()
         displayConst.cardBackground.setFill()
         roundedRect.fill()
         
-        let symbolToDraw: SymbolView = createSymbol()
-//        let symb2  : SymbolView = createSymbol()
-//        let symb3 : SymbolView = createSymbol()
-        
-        switch self.number {
-        case 1:
-            configureSymbol(theSymbol: symbolToDraw, origin: Origin2)
-        case 2:
-            configureSymbol(theSymbol: symbolToDraw, origin: Origin21)
-            let symb2  : SymbolView = createSymbol()
-            configureSymbol(theSymbol: symb2, origin: Origin22)
-        case 3:
-            configureSymbol(theSymbol: symbolToDraw, origin: Origin1)
-            let symb2  : SymbolView = createSymbol()
-            configureSymbol(theSymbol: symb2, origin: Origin2)
-            let symb3 : SymbolView = createSymbol()
-            configureSymbol(theSymbol: symb3, origin: Origin3)
-        default:
-            break
-        }
-        
+        // draw the symbols in the card
+        drawSymbol(startingAt: Origin1, forCount: number)
     }
-
-//    private lazy var symbolToDraw: SymbolView = createSymbol()
-//    private lazy var symb2  : SymbolView = createSymbol()
-//    private lazy var symb3 : SymbolView = createSymbol()
-
-    
-//    override func layoutSubviews() {
-//           super.layoutSubviews()
-//
-//        switch number {
-//        case 1:
-//            configureSymbol(theSymbol: symbolToDraw, origin: Origin2)
-//        case 2:
-//            configureSymbol(theSymbol: symbolToDraw, origin: Origin21)
-//            configureSymbol(theSymbol: symb2, origin: Origin22)
-//        case 3:
-//            configureSymbol(theSymbol: symbolToDraw, origin: Origin1)
-//            configureSymbol(theSymbol: symb2, origin: Origin2)
-//            configureSymbol(theSymbol: symb3, origin: Origin3)
-//        default:
-//            break
-//        }
-
 }
-
-
 
 extension SetCardView {
     private struct SizeRatio {
@@ -161,8 +168,6 @@ extension SetCardView {
         return symbolWidth + gapWidth
     }
     
-    
-    
     private var cornerRadius: CGFloat {
         return bounds.size.height * SizeRatio.cornerRadiusToBoundsHeight
     }
@@ -172,16 +177,6 @@ extension SetCardView {
     private var cornerFontSize: CGFloat {
         return bounds.size.height * SizeRatio.cornerFontSizeToBoundsHeight
     }
-//    private var rankString: String {
-//        switch rank {
-//        case 1: return "A"
-//        case 2...10: return String(rank)
-//        case 11: return "J"
-//        case 12: return "Q"
-//        case 13: return "K"
-//        default: return "?"
-//        }
-//    }
 }
 
 extension CGRect {

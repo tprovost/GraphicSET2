@@ -20,7 +20,7 @@ class ViewController: UIViewController {
     }
     
     private struct displayConstant {
-            static let initialDeal = 6
+            static let initialDeal = 12
             static let selectBorderWidth: CGFloat =  3.0
             static let normalBorderWidth: CGFloat = 0.0
             static let selectBorderColor = UIColor.blue.cgColor
@@ -41,7 +41,6 @@ class ViewController: UIViewController {
 
     private func UpdateViewFromModel() {
         
-        print(" ... Update View from Model")
         cardTable.clearCardViews()
         cardTable.cards = cardsInPlay
         cardTable.setUpCardViews()
@@ -49,8 +48,14 @@ class ViewController: UIViewController {
     }
     
     private func setUpGame() {
-        // deal the intial 12 cards to start the game
+//
         
+//       cardsInPlay.append(Card(color: Card.ShapeColor.green, symbol: Card.Symbol.oval, shading: Card.Shading.open, number: 3))
+//        cardsInPlay.append(Card(color: Card.ShapeColor.red, symbol: Card.Symbol.diamond, shading: Card.Shading.solid, number: 2))
+//       cardsInPlay.append(Card(color: Card.ShapeColor.purple, symbol: Card.Symbol.squiggle, shading: Card.Shading.striped, number: 3))
+//
+        // deal the intial 12 cards to start the game
+
         for cardCount in 0..<displayConstant.initialDeal {
             if let newCard = theGame.nextCard() {
                 cardsInPlay.append(newCard)

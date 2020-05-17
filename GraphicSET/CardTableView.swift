@@ -61,7 +61,6 @@ class CardTableView: UIView {
     }
     
     func setUpCardViews() {
-        print("--- Set up Card views")
         for index in 0..<cards.count {
             let newView = createCardView(forCard: cards[index])
             cardViews.append(newView)
@@ -69,7 +68,6 @@ class CardTableView: UIView {
     }
     
     func clearCardViews(){
-       print("- Clear Card Views")
         for cardView in self.subviews {
             cardView.removeFromSuperview()
         }
@@ -114,7 +112,6 @@ class CardTableView: UIView {
         super.layoutSubviews()
         
         // setUpCardViews()
-        print(" Layout Card Table")
         cardGrid.frame = self.bounds
         cardGrid.cellCount = cards.count
         
