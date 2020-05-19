@@ -28,6 +28,9 @@ class SetCardView: UIView {
     var backColor : UIColor = UIColor.white {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
+    var card : Card? = nil {
+        didSet { setNeedsDisplay(); setNeedsLayout() }
+    }
  
     private struct symbolValues {
         static let ovalCurve : CGFloat = 0.50
@@ -131,7 +134,20 @@ extension SetCardView {
         static let symbolHeighttoBoundsHeight: CGFloat = 0.80
         static let gapWidthRatio: CGFloat = 0.0625
         static let gapHeightRatio: CGFloat = 0.10
-        
+    }
+    
+    private struct cardAttributes {
+        static let selectedBorderWidth: CGFloat = 5.0
+        static let selectedBorderColor: CGColor = UIColor.blue.cgColor
+        static let highlightBackground: UIColor = UIColor.cyan
+    }
+    
+    private func selected() {
+        self.layer.borderWidth = cardAttributes.selectedBorderWidth
+        self.layer.borderColor = cardAttributes.selectedBorderColor
+    }
+    private func highlighted() {
+        self.backColor = cardAttributes.highlightBackground
     }
     
     private var symbolWidth: CGFloat {

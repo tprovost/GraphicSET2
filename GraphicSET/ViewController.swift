@@ -28,12 +28,12 @@ class ViewController: UIViewController {
             static let highlightColor = UIColor.cyan
             static let buttonBackground = UIColor.white
     }
-    
+   
     var cardsInPlay = [Card]()
     private lazy var theGame = SetGame()
     
     override func viewDidLoad() {
-        super.viewDidLoad()
+       super.viewDidLoad()
         
         setUpGame()
         UpdateViewFromModel()

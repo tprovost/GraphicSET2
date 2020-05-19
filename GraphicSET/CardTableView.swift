@@ -37,13 +37,12 @@ class CardTableView: UIView {
     var cards = [Card]()
     var cardViews = [SetCardView]()
     
-    
-    
     private func createCardView(forCard theCard: Card) -> SetCardView {
         let cardView = SetCardView()
         cardView.symbol = theCard.symbol.rawValue
         cardView.shadng = theCard.shading.rawValue
         cardView.number = theCard.number
+        cardView.card = theCard
         switch theCard.color {
         case .red :
             cardView.color = UIColor.red
@@ -57,7 +56,15 @@ class CardTableView: UIView {
         addSubview(cardView)
         cardView.isHidden = true
         //print("Card View created: \(cardView.symbol), \(cardView.color), \(cardView.shadng), \(cardView.number)")
+        let tap = UITapGestureRecognizer(target: self, action: #selector(touchCard))
+        cardView.addGestureRecognizer(tap)
         return cardView
+    }
+    
+    @objc func touchCard(sender: UITapGestureRecognizer) {
+//           print("CardView TouchCard \(String(describing: sender.view))")
+        let thisView = sender.view as! SetCardView
+        print("Card touched: \(String(describing: thisView.card))")
     }
     
     func setUpCardViews() {
@@ -69,6 +76,11 @@ class CardTableView: UIView {
     
     func clearCardViews(){
         for cardView in self.subviews {
+            if let gestureRecognizers = cardView.gestureRecognizers {
+                for gestureRecognizer in gestureRecognizers {
+                    cardView.removeGestureRecognizer(gestureRecognizer)
+                }
+            }
             cardView.removeFromSuperview()
         }
         cardViews.removeAll()
