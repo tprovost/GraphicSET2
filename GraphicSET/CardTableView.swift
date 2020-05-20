@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol HandleTouchedCard {
+    func thisCardTouched(_ sender : SetCardView)
+}
+
 class CardTableView: UIView {
 
     
@@ -31,26 +35,17 @@ class CardTableView: UIView {
         static let cardInset: CGFloat = 5.0
     }
     
-    // variables for testing.  once coded, these values will come from the
-    // view controller
-    
     var cards = [Card]()
     var cardViews = [SetCardView]()
+    var touchDelegate : HandleTouchedCard? = nil
     
     private func createCardView(forCard theCard: Card) -> SetCardView {
         let cardView = SetCardView()
-        cardView.symbol = theCard.symbol.rawValue
-        cardView.shadng = theCard.shading.rawValue
+        cardView.symbol = theCard.symbol
+        cardView.shading = theCard.shading
         cardView.number = theCard.number
+        cardView.color = theCard.color
         cardView.card = theCard
-        switch theCard.color {
-        case .red :
-            cardView.color = UIColor.red
-        case .green:
-            cardView.color = UIColor.green
-        case .purple:
-            cardView.color = UIColor.purple
-        }
         cardView.backgroundColor = UIColor.clear
         cardView.contentMode = UIView.ContentMode.redraw
         addSubview(cardView)
@@ -61,11 +56,14 @@ class CardTableView: UIView {
         return cardView
     }
     
+    
+    
     @objc func touchCard(sender: UITapGestureRecognizer) {
 //           print("CardView TouchCard \(String(describing: sender.view))")
         let thisView = sender.view as! SetCardView
-        print("Card touched: \(String(describing: thisView.card))")
-    }
+        print("CT: Card touched: \(thisView.card!.description)")
+        touchDelegate?.thisCardTouched(thisView)
+        }
     
     func setUpCardViews() {
         for index in 0..<cards.count {

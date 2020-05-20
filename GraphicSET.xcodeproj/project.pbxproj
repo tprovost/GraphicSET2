@@ -21,7 +21,6 @@
 		E0B7F9A72464F78E00542102 /* SetCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B7F9A62464F78E00542102 /* SetCardView.swift */; };
 		E0B7F9A92465B97700542102 /* CardTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B7F9A82465B97700542102 /* CardTableView.swift */; };
 		E0B7F9AB24663B8200542102 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B7F9AA24663B8200542102 /* Grid.swift */; };
-		E0B7F9AD24676E7C00542102 /* SymbolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B7F9AC24676E7C00542102 /* SymbolView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,7 +61,6 @@
 		E0B7F9A62464F78E00542102 /* SetCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetCardView.swift; sourceTree = "<group>"; };
 		E0B7F9A82465B97700542102 /* CardTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardTableView.swift; sourceTree = "<group>"; };
 		E0B7F9AA24663B8200542102 /* Grid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Grid.swift; path = "../../../Google Drive/Development/Grid.swift"; sourceTree = "<group>"; };
-		E0B7F9AC24676E7C00542102 /* SymbolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,7 +111,6 @@
 		E0B7F96F2464F48B00542102 /* GraphicSET */ = {
 			isa = PBXGroup;
 			children = (
-				E0B7F9AC24676E7C00542102 /* SymbolView.swift */,
 				E0B7F9A02464F54800542102 /* Set.swift */,
 				E0B7F9A22464F5ED00542102 /* Card.swift */,
 				E0B7F9A42464F60700542102 /* SetCardDeck.swift */,
@@ -286,7 +283,6 @@
 				E0B7F9A92465B97700542102 /* CardTableView.swift in Sources */,
 				E0B7F9A32464F5ED00542102 /* Card.swift in Sources */,
 				E0B7F9712464F48B00542102 /* AppDelegate.swift in Sources */,
-				E0B7F9AD24676E7C00542102 /* SymbolView.swift in Sources */,
 				E0B7F9732464F48B00542102 /* SceneDelegate.swift in Sources */,
 				E0B7F9A52464F60700542102 /* SetCardDeck.swift in Sources */,
 				E0B7F9AB24663B8200542102 /* Grid.swift in Sources */,

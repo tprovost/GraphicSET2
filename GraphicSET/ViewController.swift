@@ -8,7 +8,9 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, HandleTouchedCard {
+    
+    
 
     @IBOutlet weak var cardTable: CardTableView! {
         didSet {
@@ -17,6 +19,8 @@ class ViewController: UIViewController {
             swipe.direction = [.up]
             cardTable.addGestureRecognizer(swipe)
         }
+        
+        
     }
     
     private struct displayConstant {
@@ -35,6 +39,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
        super.viewDidLoad()
         
+        cardTable.touchDelegate = self
         setUpGame()
         UpdateViewFromModel()
     }
@@ -66,6 +71,7 @@ class ViewController: UIViewController {
             }
     }
     
+    
     // this function will attempt to deal 3 new cards based
     // on available space and available cards
     @objc func dealThreeCards() {
@@ -80,6 +86,10 @@ class ViewController: UIViewController {
         } while (index < 3)
         
         UpdateViewFromModel()
+    }
+    
+    func thisCardTouched(_ sender: SetCardView) {
+        print("VC Card touched: \(sender.card?.description ?? "no card")")
     }
 }
 

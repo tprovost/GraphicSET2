@@ -13,18 +13,20 @@ class SetCardView: UIView {
     private struct displayConst {
         static let cardBackground : UIColor = symbolValues.backColor
     }
-    var symbol : Int = SymbolView.Symbol.diamond.rawValue {
+    var symbol : Card.Symbol = Card.Symbol.diamond {
+        didSet { setNeedsDisplay(); setNeedsLayout() }
+        }
+    var shading : Card.Shading = Card.Shading.open {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
-    var shadng : Int = SymbolView.Shading.open.rawValue {
+    var color : Card.ShapeColor = Card.ShapeColor.red {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
-    var color : UIColor = UIColor.black {
+    var number : Int = 1 {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
-    var number : Int = 2 {
-        didSet { setNeedsDisplay(); setNeedsLayout() }
-    }
+    var drawColor : UIColor = UIColor.black
+    
     var backColor : UIColor = UIColor.white {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
@@ -58,18 +60,18 @@ class SetCardView: UIView {
         
         for _ in 0..<number {
             switch symbol {
-            case Card.Symbol.diamond.rawValue:
+            case Card.Symbol.diamond:
                 symbolPath.move(to: CGPoint(x: midX, y: minY))
                 symbolPath.addLine(to: CGPoint(x: maxX, y: midY))
                 symbolPath.addLine(to: CGPoint(x: midX, y: maxY))
                 symbolPath.addLine(to: CGPoint(x: minX, y: midY))
                 symbolPath.close()
                 symbolPath.lineWidth = symbolValues.lineWidth
-            case Card.Symbol.oval.rawValue:
+            case Card.Symbol.oval:
                 let rect = CGRect(origin: CGPoint(x: minX, y: minY), size: CGSize(width: symbolWidth, height: symbolHeight))
                 let ovalPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.size.width * symbolValues.ovalCurve)
                 symbolPath.append(ovalPath)
-            case Card.Symbol.squiggle.rawValue:
+            case Card.Symbol.squiggle:
                 symbolPath.move(to: CGPoint(x: minX, y: minY))
                 symbolPath.addLine(to: CGPoint(x: minX + 0.75*symbolWidth, y: minY + 0.32*symbolHeight))
                 symbolPath.addLine(to: CGPoint(x: minX + 0.50*symbolWidth, y: minY + 0.68*symbolHeight))
@@ -77,35 +79,40 @@ class SetCardView: UIView {
                 symbolPath.addLine(to: CGPoint(x: minX + 0.20*symbolWidth, y: minY + 0.68*symbolHeight))
                 symbolPath.addLine(to: CGPoint(x: minX + 0.32*symbolWidth, y: minY + 0.32*symbolHeight))
                 symbolPath.close()
-            default:
-                break
             }
             
             minX += widthBetweenSymbols
 
         }
             
-           symbolPath.addClip()
+        symbolPath.addClip()
         
-            switch shadng {
-            case SymbolView.Shading.solid.rawValue:
-                color.setFill()
-            case SymbolView.Shading.striped.rawValue:
-                var lineY : CGFloat = minY + symbolValues.stripeGap
-                repeat {
-                    symbolPath.move(to: CGPoint(x: initOrigin.x, y: lineY))
-                    symbolPath.addLine(to: CGPoint(x: maxX, y: lineY))
-                    lineY += symbolValues.stripeGap
-                } while lineY < maxY
-                symbolValues.backColor.setFill()
-            case SymbolView.Shading.open.rawValue:
-                symbolValues.backColor.setFill()
-            default:
-                break
-            }
+        switch color {
+        case .green:
+            drawColor = UIColor.green
+        case .purple:
+            drawColor = UIColor.purple
+        case .red:
+            drawColor = UIColor.red
+        }
+        
+        switch shading {
+        case Card.Shading.solid:
+            drawColor.setFill()
+        case Card.Shading.striped:
+            var lineY : CGFloat = minY + symbolValues.stripeGap
+            repeat {
+                symbolPath.move(to: CGPoint(x: initOrigin.x, y: lineY))
+                symbolPath.addLine(to: CGPoint(x: maxX, y: lineY))
+                lineY += symbolValues.stripeGap
+            } while lineY < maxY
+            symbolValues.backColor.setFill()
+        case Card.Shading.open:
+            symbolValues.backColor.setFill()
+        }
             
         symbolPath.lineWidth = symbolValues.lineWidth
-        color.setStroke()
+        drawColor.setStroke()
         symbolPath.fill()
         symbolPath.stroke()
         
