@@ -149,11 +149,11 @@ extension SetCardView {
         static let highlightBackground: UIColor = UIColor.cyan
     }
     
-    private func selected() {
+    func selected() {
         self.layer.borderWidth = cardAttributes.selectedBorderWidth
         self.layer.borderColor = cardAttributes.selectedBorderColor
     }
-    private func highlighted() {
+    func highlighted() {
         self.backColor = cardAttributes.highlightBackground
     }
     

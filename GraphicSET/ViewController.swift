@@ -48,7 +48,7 @@ class ViewController: UIViewController, HandleTouchedCard {
         
         cardTable.clearCardViews()
         cardTable.cards = cardsInPlay
-        cardTable.setUpCardViews()
+        cardTable.setUpCardViews(selectedCards: theGame.cardsSelected, cardsMatch: theGame.selectedCardsAreAMatch)
         cardTable.setNeedsDisplay()
     }
     
@@ -89,7 +89,22 @@ class ViewController: UIViewController, HandleTouchedCard {
     }
     
     func thisCardTouched(_ sender: SetCardView) {
-        print("VC Card touched: \(sender.card?.description ?? "no card")")
+        if sender.card != nil, let cardsMatched = theGame.chooseCard(forCard: sender.card!) {
+            clearMatchedCards(theCards: cardsMatched)
+            dealThreeCards()
+        }
+        UpdateViewFromModel()
+//        print("VC Card touched: \(sender.card?.description ?? "no card")")
     }
+    
+    private func clearMatchedCards(theCards:[Card]) {
+           // take the matched cards and clear them as used and
+           // remove them from the buttons
+           for theCard in theCards {
+               if let crdIndex = cardsInPlay.firstIndex(of: theCard) {
+                cardsInPlay.remove(at: crdIndex)
+               }
+           }
+       }
 }
 

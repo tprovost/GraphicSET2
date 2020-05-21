@@ -65,9 +65,15 @@ class CardTableView: UIView {
         touchDelegate?.thisCardTouched(thisView)
         }
     
-    func setUpCardViews() {
+    func setUpCardViews(selectedCards: [Card], cardsMatch : Bool) {
         for index in 0..<cards.count {
             let newView = createCardView(forCard: cards[index])
+            if selectedCards.contains(cards[index]) {
+                newView.selected()
+                if cardsMatch {
+                    newView.highlighted()
+                }
+            }
             cardViews.append(newView)
         }
     }
