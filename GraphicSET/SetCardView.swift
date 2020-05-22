@@ -10,12 +10,12 @@ import UIKit
 
 class SetCardView: UIView {
 
-    private struct displayConst {
-        static let cardBackground : UIColor = symbolValues.backColor
+    var cardBackground : UIColor = symbolValues.backColor {
+        didSet { setNeedsDisplay(); setNeedsLayout() }
     }
     var symbol : Card.Symbol = Card.Symbol.diamond {
         didSet { setNeedsDisplay(); setNeedsLayout() }
-        }
+    }
     var shading : Card.Shading = Card.Shading.open {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
@@ -122,7 +122,7 @@ class SetCardView: UIView {
         // Draw card background with rounded corners
         let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
         roundedRect.addClip()
-        displayConst.cardBackground.setFill()
+        cardBackground.setFill()
         roundedRect.fill()
         
         // draw the symbols in the card

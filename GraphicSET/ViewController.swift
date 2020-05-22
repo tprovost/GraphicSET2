@@ -10,7 +10,7 @@ import UIKit
 
 class ViewController: UIViewController, HandleTouchedCard {
     
-    
+    private var swipe : UIGestureRecognizer? = nil
 
     @IBOutlet weak var cardTable: CardTableView! {
         didSet {
@@ -81,6 +81,9 @@ class ViewController: UIViewController, HandleTouchedCard {
                 cardsInPlay.append(newCard)
             } else {  // no more cards
                 //disable swipe for new cards
+                if swipe != nil {
+                    cardTable.removeGestureRecognizer(swipe!)
+                }
             }
             index += 1
         } while (index < 3)

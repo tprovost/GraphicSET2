@@ -61,7 +61,7 @@ class CardTableView: UIView {
     @objc func touchCard(sender: UITapGestureRecognizer) {
 //           print("CardView TouchCard \(String(describing: sender.view))")
         let thisView = sender.view as! SetCardView
-        print("CT: Card touched: \(thisView.card!.description)")
+//        print("CT: Card touched: \(thisView.card!.description)")
         touchDelegate?.thisCardTouched(thisView)
         }
     
@@ -71,7 +71,7 @@ class CardTableView: UIView {
             if selectedCards.contains(cards[index]) {
                 newView.selected()
                 if cardsMatch {
-                    newView.highlighted()
+                    newView.cardBackground = UIColor.cyan
                 }
             }
             cardViews.append(newView)
