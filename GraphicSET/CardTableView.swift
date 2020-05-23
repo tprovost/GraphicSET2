@@ -60,10 +60,19 @@ class CardTableView: UIView {
     
     @objc func touchCard(sender: UITapGestureRecognizer) {
 //           print("CardView TouchCard \(String(describing: sender.view))")
-        let thisView = sender.view as! SetCardView
-//        print("CT: Card touched: \(thisView.card!.description)")
-        touchDelegate?.thisCardTouched(thisView)
+        switch sender.state {
+        case .ended:
+            let thisView = sender.view as? SetCardView
+            //        print("CT: Card touched: \(thisView.card!.description)")
+            if thisView != nil {
+                touchDelegate?.thisCardTouched(thisView!)
+            }
+        case .cancelled:
+            break
+        default:
+            break
         }
+    }
     
     func setUpCardViews(selectedCards: [Card], cardsMatch : Bool) {
         for index in 0..<cards.count {
@@ -109,20 +118,20 @@ class CardTableView: UIView {
     
     private var cardGrid = Grid(layout: Grid.Layout.aspectRatio(tableConstant.aspectRatio))
     
-    
-//    override func draw(_ rect: CGRect) {
-//
-//        // setUpCardViews()
-//
-//        cardGrid.frame = self.bounds
-//        cardGrid.cellCount = cards.count
-//
-//        for index in 0..<cards.count {
-//            if let cardPos = cardGrid[index] {
-//                configureAndDisplayCardView(cardView: cardViews[index], atPosition: cardPos)
-//            }
-//        }
-//        }
+    func shuffle(theCards: [Card]) -> [Card] {
+        //  shuffle the cards and return the shuffled cards using Fisher-Yates algorithm
+        var shuffledCards = theCards
+        var cardIndex = shuffledCards.count - 1
+        while cardIndex > 0 {
+            let switchIndex = Int(arc4random_uniform(UInt32(cardIndex)))
+            let tempCard = shuffledCards[cardIndex]
+            shuffledCards[cardIndex] = shuffledCards[switchIndex]
+            shuffledCards[switchIndex] = tempCard
+            cardIndex -= 1
+        }
+        
+        return shuffledCards
+    }
 
     override func layoutSubviews() {
         super.layoutSubviews()

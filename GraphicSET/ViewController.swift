@@ -16,11 +16,21 @@ class ViewController: UIViewController, HandleTouchedCard {
         didSet {
             // set up swipe gesture for getting new cards
             let swipe = UISwipeGestureRecognizer(target: self, action: #selector(dealThreeCards))
-            swipe.direction = [.up]
+            swipe.direction = [.down]
             cardTable.addGestureRecognizer(swipe)
+            
+            let rotate = UIRotationGestureRecognizer(target: self, action: #selector(shuffleCards))
+            rotate.rotation = displayConstant.rotationAmount
+            cardTable.addGestureRecognizer(rotate)
         }
-        
-        
+    }
+    
+    @IBOutlet weak var scoreLabel: UILabel!
+    
+    @IBAction func newGameButton(_ sender: UIButton) {
+        theGame = SetGame()
+        setUpGame()
+        UpdateViewFromModel()
     }
     
     private struct displayConstant {
@@ -31,6 +41,7 @@ class ViewController: UIViewController, HandleTouchedCard {
             static let normalBorderColor = UIColor.black.cgColor
             static let highlightColor = UIColor.cyan
             static let buttonBackground = UIColor.white
+            static let rotationAmount: CGFloat = CGFloat.pi / 2.0
     }
    
     var cardsInPlay = [Card]()
@@ -50,6 +61,10 @@ class ViewController: UIViewController, HandleTouchedCard {
         cardTable.cards = cardsInPlay
         cardTable.setUpCardViews(selectedCards: theGame.cardsSelected, cardsMatch: theGame.selectedCardsAreAMatch)
         cardTable.setNeedsDisplay()
+        
+        // update the score label
+        
+        scoreLabel.text = "Score: \(theGame.theScore)"
     }
     
     private func setUpGame() {
@@ -59,6 +74,8 @@ class ViewController: UIViewController, HandleTouchedCard {
 //        cardsInPlay.append(Card(color: Card.ShapeColor.red, symbol: Card.Symbol.diamond, shading: Card.Shading.solid, number: 2))
 //       cardsInPlay.append(Card(color: Card.ShapeColor.purple, symbol: Card.Symbol.squiggle, shading: Card.Shading.striped, number: 3))
 //
+        cardsInPlay.removeAll()     // clear all the cards from the table
+        
         // deal the intial 12 cards to start the game
 
         for cardCount in 0..<displayConstant.initialDeal {
@@ -74,30 +91,61 @@ class ViewController: UIViewController, HandleTouchedCard {
     
     // this function will attempt to deal 3 new cards based
     // on available space and available cards
-    @objc func dealThreeCards() {
-        var index = 0
-        repeat {
-            if let newCard = theGame.nextCard() {
-                cardsInPlay.append(newCard)
-            } else {  // no more cards
-                //disable swipe for new cards
-                if swipe != nil {
-                    cardTable.removeGestureRecognizer(swipe!)
-                }
-            }
-            index += 1
-        } while (index < 3)
+    @objc func dealThreeCards(_ sender:UISwipeGestureRecognizer?) {
+        // need to handle both cases here, so set this var if we
+        // need to deal the cards.  Only case where not, is if the swipe is
+        // NOT ended properly
         
-        UpdateViewFromModel()
+        var needCards = true
+        
+        switch sender?.state {
+        case .ended:
+            needCards = true
+        case .cancelled:
+            needCards = false
+        default:
+            needCards = false
+            break
+        }
+        if needCards {
+            var index = 0
+            repeat {
+                if let newCard = theGame.nextCard() {
+                    cardsInPlay.append(newCard)
+                } else {  // no more cards
+                    //disable swipe for new cards
+                    if swipe != nil {
+                        cardTable.removeGestureRecognizer(swipe!)
+                    }
+                }
+                index += 1
+            } while (index < 3)
+            
+            UpdateViewFromModel()
+        }
     }
     
     func thisCardTouched(_ sender: SetCardView) {
         if sender.card != nil, let cardsMatched = theGame.chooseCard(forCard: sender.card!) {
             clearMatchedCards(theCards: cardsMatched)
-            dealThreeCards()
+            dealThreeCards(nil)
         }
         UpdateViewFromModel()
 //        print("VC Card touched: \(sender.card?.description ?? "no card")")
+    }
+    
+    @objc func shuffleCards(_ sender:UIRotationGestureRecognizer) {
+        
+        switch sender.state {
+        case .ended:
+            cardsInPlay = cardTable.shuffle(theCards: cardsInPlay)
+            UpdateViewFromModel()
+        case .cancelled:
+            break
+        default:
+            break
+        }
+        
     }
     
     private func clearMatchedCards(theCards:[Card]) {
