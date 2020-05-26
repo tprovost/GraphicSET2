@@ -48,6 +48,7 @@ class CardTableView: UIView {
         cardView.card = theCard
         cardView.backgroundColor = UIColor.clear
         cardView.contentMode = UIView.ContentMode.redraw
+        cardView.unselect()
         addSubview(cardView)
         cardView.isHidden = true
         //print("Card View created: \(cardView.symbol), \(cardView.color), \(cardView.shadng), \(cardView.number)")
@@ -74,40 +75,66 @@ class CardTableView: UIView {
         }
     }
     
-    func setUpCardViews(selectedCards: [Card], cardsMatch : Bool) {
-        for index in 0..<cards.count {
-            let newView = createCardView(forCard: cards[index])
-            if selectedCards.contains(cards[index]) {
-                newView.selected()
+    func setUpCardViews(with newCards: [Card], selectedCards: [Card], cardsMatch : Bool) {
+        // set up views for new cards
+        if newCards.count > cards.count {
+            // we have new cards
+            let addedCards = newCards.subtracting(from: cards)
+            for eachcard in addedCards {
+                let newView = createCardView(forCard: eachcard)
+                cardViews.append(newView)
+            }
+        }
+        
+        // check to see if any cards/views are selected and/or matched
+        for view in  cardViews {
+            if selectedCards.contains(view.card!) {
+                view.selected()
                 if cardsMatch {
-                    newView.cardBackground = UIColor.cyan
+                    view.cardBackground = UIColor.cyan
                 }
+            } else {
+                // unselect
+                view.unselect()
             }
-            cardViews.append(newView)
         }
     }
     
-    func clearCardViews(){
-        for cardView in self.subviews {
-            if let gestureRecognizers = cardView.gestureRecognizers {
-                for gestureRecognizer in gestureRecognizers {
-                    cardView.removeGestureRecognizer(gestureRecognizer)
+    func clearCardViews(with newCards: [Card]){
+        // find the difference in the card decks and deal with those only
+        // compare our cards variable with the newCards
+        
+        if newCards.count < cards.count {
+            // removed cards
+            let removedCards = cards.subtracting(from: newCards)
+            for eachCard in removedCards {
+                if let removeIndex = cardViews.firstIndex(where: {$0.card == eachCard}) {
+                    cardViews.remove(at: removeIndex)
                 }
             }
-            cardView.removeFromSuperview()
         }
-        cardViews.removeAll()
+        
+//        for cardView in self.subviews {
+//            if let gestureRecognizers = cardView.gestureRecognizers {
+//                for gestureRecognizer in gestureRecognizers {
+//                    cardView.removeGestureRecognizer(gestureRecognizer)
+//                }
+//            }
+//            cardView.removeFromSuperview()
+//        }
+//        cardViews.removeAll()
     }
     
-    private func configureAndDisplayCardView(cardView: SetCardView, atOrigin: CGPoint, withSize: CGSize) {
-        cardView.frame = CGRect(origin: atOrigin, size: withSize)
-        cardView.isHidden = false
-    }
+//    private func configureAndDisplayCardView(cardView: SetCardView, atOrigin: CGPoint, withSize: CGSize) {
+//        cardView.frame = CGRect(origin: atOrigin, size: withSize)
+//        cardView.isHidden = false
+//    }
     
     private func configureAndDisplayCardView(cardView: SetCardView, atPosition position: CGRect) {
         let insetOrigin = CGPoint(x: position.origin.x+tableConstant.cardInset, y: position.origin.y+tableConstant.cardInset)
         let insetSize = CGSize(width: position.width-(2*tableConstant.cardInset), height: position.height-(2*tableConstant.cardInset))
         cardView.frame = CGRect(origin: insetOrigin, size: insetSize)
+        
         cardView.isHidden = false
     }
     
@@ -146,5 +173,13 @@ class CardTableView: UIView {
             }
         }
         
+    }
+}
+
+extension Array where Element: Hashable {
+    func subtracting(from other: [Element]) -> [Element] {
+        let thisSet = Set(self)
+        let otherSet = Set(other)
+        return Array(thisSet.subtracting(otherSet))
     }
 }

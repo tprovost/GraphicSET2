@@ -145,13 +145,19 @@ extension SetCardView {
     
     private struct cardAttributes {
         static let selectedBorderWidth: CGFloat = 5.0
+        static let normalBorderWidth: CGFloat = 1.0
         static let selectedBorderColor: CGColor = UIColor.blue.cgColor
+        static let normalBorderColor: CGColor = UIColor.black.cgColor
         static let highlightBackground: UIColor = UIColor.cyan
     }
     
     func selected() {
         self.layer.borderWidth = cardAttributes.selectedBorderWidth
         self.layer.borderColor = cardAttributes.selectedBorderColor
+    }
+    func unselect() {
+        self.layer.borderWidth = cardAttributes.normalBorderWidth
+        self.layer.borderColor = cardAttributes.normalBorderColor
     }
     func highlighted() {
         self.backColor = cardAttributes.highlightBackground
