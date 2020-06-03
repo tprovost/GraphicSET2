@@ -24,6 +24,10 @@ class ViewController: UIViewController, HandleTouchedCard {
             cardTable.addGestureRecognizer(rotate)
         }
     }
+    @IBAction func dealButton(_ sender: UIButton) {
+    }
+    @IBOutlet weak var deckButton: UIButton!
+    @IBOutlet weak var discardDeck: UILabel!
     
     @IBOutlet weak var scoreLabel: UILabel!
     
@@ -50,7 +54,13 @@ class ViewController: UIViewController, HandleTouchedCard {
     override func viewDidLoad() {
        super.viewDidLoad()
         
+        
         cardTable.touchDelegate = self
+        cardTable.dealDeckFrame = deckButton.frame
+        cardTable.discardDeckFrame = discardDeck.frame
+        cardTable.dealDeckHeight = deckButton.frame.height
+//        cardTable.gridFrame = CGRect(x: cardTable.frame.origin.x, y: cardTable.frame.origin.y, width: cardTable.frame.width, height: cardTable.frame.height - discardDeck.frame.height)
+        // adjust height to allow for deal and discard decks
         setUpGame()
         UpdateViewFromModel()
     }
@@ -68,12 +78,7 @@ class ViewController: UIViewController, HandleTouchedCard {
     }
     
     private func setUpGame() {
-//
-        
-//       cardsInPlay.append(Card(color: Card.ShapeColor.green, symbol: Card.Symbol.oval, shading: Card.Shading.open, number: 3))
-//        cardsInPlay.append(Card(color: Card.ShapeColor.red, symbol: Card.Symbol.diamond, shading: Card.Shading.solid, number: 2))
-//       cardsInPlay.append(Card(color: Card.ShapeColor.purple, symbol: Card.Symbol.squiggle, shading: Card.Shading.striped, number: 3))
-//
+
         cardsInPlay.removeAll()     // clear all the cards from the table
         
         // deal the intial 12 cards to start the game
@@ -127,6 +132,8 @@ class ViewController: UIViewController, HandleTouchedCard {
     
     func thisCardTouched(_ sender: SetCardView) {
         if sender.card != nil, let cardsMatched = theGame.chooseCard(forCard: sender.card!) {
+            
+            
             clearMatchedCards(theCards: cardsMatched)
             dealThreeCards(nil)
         }
@@ -149,13 +156,15 @@ class ViewController: UIViewController, HandleTouchedCard {
     }
     
     private func clearMatchedCards(theCards:[Card]) {
-           // take the matched cards and clear them as used and
-           // remove them from the buttons
-           for theCard in theCards {
-               if let crdIndex = cardsInPlay.firstIndex(of: theCard) {
-                cardsInPlay.remove(at: crdIndex)
-               }
-           }
-       }
+       // take the matched cards and clear them as used and
+       // remove them from the card table
+        cardTable.removeCards(forCards: theCards)
+        cardsInPlay = cardsInPlay.subtracting(from: theCards)
+//       for theCard in theCards {
+//           if let crdIndex = cardsInPlay.firstIndex(of: theCard) {
+//            cardsInPlay.remove(at: crdIndex)
+//           }
+//       }
+    }
 }
 

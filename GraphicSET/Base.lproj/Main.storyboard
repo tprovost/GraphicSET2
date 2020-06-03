@@ -19,22 +19,60 @@
                                 <rect key="frame" x="20" y="44" width="374.5" height="810"/>
                                 <subviews>
                                     <view contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="698-sw-bF9" customClass="CardTableView" customModule="GraphicSET" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="374.5" height="733"/>
-                                        <color key="backgroundColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    </view>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9cG-in-GRk">
-                                        <rect key="frame" x="0.0" y="764" width="374.5" height="0.0"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                        <state key="normal" title="New Game"/>
-                                        <connections>
-                                            <action selector="newGameButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="AJa-hb-UB4"/>
-                                        </connections>
-                                    </button>
-                                    <stackView opaque="NO" contentMode="scaleAspectFit" distribution="equalSpacing" spacing="255" translatesAutoresizingMaskIntoConstraints="NO" id="YND-Sf-rE7">
-                                        <rect key="frame" x="0.0" y="795" width="374.5" height="15"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="374.5" height="744"/>
                                         <subviews>
+                                            <stackView opaque="NO" contentMode="scaleToFill" spacing="160" translatesAutoresizingMaskIntoConstraints="NO" id="Ezf-H5-Bpv">
+                                                <rect key="frame" x="8" y="686" width="358" height="50"/>
+                                                <subviews>
+                                                    <button contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qQA-AP-74J">
+                                                        <rect key="frame" x="0.0" y="0.0" width="98" height="50"/>
+                                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="50" id="OJW-2U-qQy"/>
+                                                            <constraint firstAttribute="width" secondItem="qQA-AP-74J" secondAttribute="height" multiplier="8:5" priority="750" constant="18" id="yug-ig-Sac"/>
+                                                        </constraints>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                                        <state key="normal" title="Deal">
+                                                            <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </state>
+                                                        <connections>
+                                                            <action selector="dealButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="8sy-BG-7Ru"/>
+                                                        </connections>
+                                                    </button>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0 Sets" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EOW-ho-L5G">
+                                                        <rect key="frame" x="258" y="0.0" width="100" height="50"/>
+                                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="EOW-ho-L5G" secondAttribute="height" multiplier="8:5" priority="750" constant="20" id="cPC-Yf-pWS"/>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="100" id="oUK-2a-hPj"/>
+                                                        </constraints>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                </subviews>
+                                            </stackView>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstItem="Ezf-H5-Bpv" firstAttribute="leading" secondItem="698-sw-bF9" secondAttribute="leading" constant="8" id="PQK-sA-Qzh"/>
+                                            <constraint firstAttribute="trailing" secondItem="Ezf-H5-Bpv" secondAttribute="trailing" constant="8.5" id="dBO-da-RvI"/>
+                                            <constraint firstAttribute="bottom" secondItem="Ezf-H5-Bpv" secondAttribute="bottom" constant="8" id="jnE-xy-ZYT"/>
+                                        </constraints>
+                                    </view>
+                                    <stackView opaque="NO" contentMode="scaleAspectFit" distribution="equalSpacing" spacing="255" translatesAutoresizingMaskIntoConstraints="NO" id="YND-Sf-rE7">
+                                        <rect key="frame" x="0.0" y="775" width="374.5" height="35"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9cG-in-GRk">
+                                                <rect key="frame" x="0.0" y="0.0" width="60" height="35"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                                <state key="normal" title="New Game"/>
+                                                <connections>
+                                                    <action selector="newGameButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="AJa-hb-UB4"/>
+                                                </connections>
+                                            </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Score" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dAX-Gv-7Mg">
-                                                <rect key="frame" x="0.0" y="0.0" width="374.5" height="15"/>
+                                                <rect key="frame" x="315" y="0.0" width="59.5" height="35"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -58,6 +96,8 @@
                     </view>
                     <connections>
                         <outlet property="cardTable" destination="698-sw-bF9" id="nEl-2e-xQe"/>
+                        <outlet property="deckButton" destination="qQA-AP-74J" id="3F1-bj-GrJ"/>
+                        <outlet property="discardDeck" destination="EOW-ho-L5G" id="vAf-FK-oeA"/>
                         <outlet property="scoreLabel" destination="dAX-Gv-7Mg" id="kXz-N9-KK1"/>
                     </connections>
                 </viewController>

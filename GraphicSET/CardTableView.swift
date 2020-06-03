@@ -33,11 +33,22 @@ class CardTableView: UIView {
     private struct tableConstant {
         static let aspectRatio: CGFloat = 1.60  // 8:5
         static let cardInset: CGFloat = 5.0
+        static let extraHeightGap: CGFloat = 10.0
+    }
+    
+    private struct animationConstant {
+        static let arrangeDuration = 3.0
     }
     
     var cards = [Card]()
     var cardViews = [SetCardView]()
     var touchDelegate : HandleTouchedCard? = nil
+    var gridFrame = CGRect()
+    var dealDeckFrame = CGRect()
+    var discardDeckFrame = CGRect()
+    var dealDeckHeight : CGFloat = 0.0
+    var gridCount : Int = 0
+    
     
     private func createCardView(forCard theCard: Card) -> SetCardView {
         let cardView = SetCardView()
@@ -75,15 +86,53 @@ class CardTableView: UIView {
         }
     }
     
+    private func getCardView(forCard: Card) -> SetCardView? {
+        return cardViews.first(where: {$0.card == forCard})
+    }
+    private func getCardViewIndex(forCard: Card) -> Int? {
+        return cardViews.firstIndex(where: {$0.card == forCard})
+    }
+    
+    func addCardtoTable(forCard: Card) {
+        let newView = createCardView(forCard: forCard)
+        cardViews.append(newView)
+    }
+    
+    func removeCardfromTable(forCard: Card) {
+        if let removeIndex = getCardViewIndex(forCard: forCard) {
+        // TODO: check this and replace when doing the discard animation
+        // it will be in the closing function for the animation
+                        cardViews[removeIndex].removeFromSuperview()
+                        cardViews.remove(at: removeIndex)
+                    }
+    }
+    
+    func addCards(addedCards: [Card]) {
+        for eachcard in addedCards {
+            addCardtoTable(forCard: eachcard)
+//            let newView = createCardView(forCard: eachcard)
+//            cardViews.append(newView)
+        }
+    }
+    
+    func removeCards(forCards removedCards: [Card]) {
+        for eachCard in removedCards {
+            removeCardfromTable(forCard: eachCard)
+//            if let removeIndex = getCardViewIndex(forCard: eachCard) {
+// TODO: check this and replace when doing the discard animation
+// it will be in the closing function for the animation
+//                cardViews[removeIndex].removeFromSuperview()
+//                cardViews.remove(at: removeIndex)
+//            }
+        }
+    }
+    
     func setUpCardViews(with newCards: [Card], selectedCards: [Card], cardsMatch : Bool) {
         // set up views for new cards
         if newCards.count > cards.count {
             // we have new cards
             let addedCards = newCards.subtracting(from: cards)
-            for eachcard in addedCards {
-                let newView = createCardView(forCard: eachcard)
-                cardViews.append(newView)
-            }
+            addCards(addedCards: addedCards)
         }
         
         // check to see if any cards/views are selected and/or matched
@@ -107,11 +156,7 @@ class CardTableView: UIView {
         if newCards.count < cards.count {
             // removed cards
             let removedCards = cards.subtracting(from: newCards)
-            for eachCard in removedCards {
-                if let removeIndex = cardViews.firstIndex(where: {$0.card == eachCard}) {
-                    cardViews.remove(at: removeIndex)
-                }
-            }
+            removeCards(forCards: removedCards)
         }
         
 //        for cardView in self.subviews {
@@ -125,17 +170,26 @@ class CardTableView: UIView {
 //        cardViews.removeAll()
     }
     
-//    private func configureAndDisplayCardView(cardView: SetCardView, atOrigin: CGPoint, withSize: CGSize) {
-//        cardView.frame = CGRect(origin: atOrigin, size: withSize)
-//        cardView.isHidden = false
-//    }
+    
+    
     
     private func configureAndDisplayCardView(cardView: SetCardView, atPosition position: CGRect) {
         let insetOrigin = CGPoint(x: position.origin.x+tableConstant.cardInset, y: position.origin.y+tableConstant.cardInset)
         let insetSize = CGSize(width: position.width-(2*tableConstant.cardInset), height: position.height-(2*tableConstant.cardInset))
-        cardView.frame = CGRect(origin: insetOrigin, size: insetSize)
-        
+
         cardView.isHidden = false
+        
+        // animate the arrangment
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(
+            withDuration: animationConstant.arrangeDuration,
+            delay: 0.0,
+            options: UIView.AnimationOptions.curveEaseIn,
+            animations: {cardView.frame = CGRect(origin: insetOrigin, size: insetSize)})
+        
+//        UIView.transition(with: cardView,
+//                          duration: animationConstant.arrangeDuration,
+//                          options: UIView.AnimationOptions.curveEaseIn, animations: {cardView.frame = CGRect(origin: insetOrigin, size: insetSize)})
     }
     
     /*
@@ -163,8 +217,9 @@ class CardTableView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        // setUpCardViews()
-        cardGrid.frame = self.bounds
+        // layout the cards in the proper positions
+//        cardGrid.frame = self.bounds
+        cardGrid.frame = CGRect(x: self.bounds.minX, y: self.bounds.minY, width: self.bounds.width, height: self.bounds.height - dealDeckHeight - tableConstant.extraHeightGap)
         cardGrid.cellCount = cards.count
         
         for index in 0..<cards.count {
