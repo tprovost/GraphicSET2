@@ -33,7 +33,11 @@ class SetCardView: UIView {
     var card : Card? = nil {
         didSet { setNeedsDisplay(); setNeedsLayout() }
     }
- 
+    var isFaceUp = true {
+        didSet { setNeedsDisplay()}
+    }
+    var cardBackColor : UIColor = UIColor.blue
+    
     private struct symbolValues {
         static let ovalCurve : CGFloat = 0.50
         static let lineWidth : CGFloat = 3.0
@@ -126,7 +130,15 @@ class SetCardView: UIView {
         roundedRect.fill()
         
         // draw the symbols in the card
-        drawSymbol(startingAt: Origin1, forCount: number)
+        if self.isFaceUp {
+            drawSymbol(startingAt: Origin1, forCount: number)
+        } else {
+            let faceRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+            faceRect.addClip()
+            cardBackColor.setFill()
+            faceRect.fill()
+            
+        }
     }
 }
 
@@ -147,7 +159,7 @@ extension SetCardView {
         static let selectedBorderWidth: CGFloat = 5.0
         static let normalBorderWidth: CGFloat = 1.0
         static let selectedBorderColor: CGColor = UIColor.blue.cgColor
-        static let normalBorderColor: CGColor = UIColor.black.cgColor
+        static let normalBorderColor: CGColor = UIColor.clear.cgColor
         static let highlightBackground: UIColor = UIColor.cyan
     }
     

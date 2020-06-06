@@ -38,12 +38,16 @@ class CardTableView: UIView {
     
     private struct animationConstant {
         static let arrangeDuration = 3.0
+        static let dealInterval = 1.0
     }
     
     var cards = [Card]()
     var cardViews = [SetCardView]()
     var touchDelegate : HandleTouchedCard? = nil
     var gridFrame = CGRect()
+    var cardDecks: UIStackView?
+    var deckButton: UIButton?
+    var discardLabel:UILabel?
     var dealDeckFrame = CGRect()
     var discardDeckFrame = CGRect()
     var dealDeckHeight : CGFloat = 0.0
@@ -62,13 +66,22 @@ class CardTableView: UIView {
         cardView.unselect()
         addSubview(cardView)
         cardView.isHidden = true
+        cardView.isFaceUp = false
         //print("Card View created: \(cardView.symbol), \(cardView.color), \(cardView.shadng), \(cardView.number)")
         let tap = UITapGestureRecognizer(target: self, action: #selector(touchCard))
         cardView.addGestureRecognizer(tap)
+        // create card view initially at the deal deck location and size
+        cardView.frame = CGRect(origin: cardDecks!.frame.origin, size: dealDeckFrame.size)
+//        cardView.frame = dealDeckFrame
+        // when ready, start facedown
+//        cardView.isFaceUp = false
         return cardView
     }
     
-    
+    private func dealNewCard(newCard: SetCardView, toPosition: CGRect) {
+        // animate the new card view from the deal deck to its new position
+        
+    }
     
     @objc func touchCard(sender: UITapGestureRecognizer) {
 //           print("CardView TouchCard \(String(describing: sender.view))")
@@ -107,12 +120,28 @@ class CardTableView: UIView {
                     }
     }
     
-    func addCards(addedCards: [Card]) {
+    func addCards(addedCards: [Card], addPositionIndex: [Int]) {
+        // layout the existing cards based on leaving room for new cards
+        var posIndex: Int = 0
+        gridCount += addedCards.count
+        setNeedsLayout()
+        layoutIfNeeded()
+        var startDelay : Double = 0.0
         for eachcard in addedCards {
-            addCardtoTable(forCard: eachcard)
+            cards.append(eachcard)
+            let newView = createCardView(forCard: eachcard)
+            cardViews.append(newView)
+            if let cardPos = cardGrid[addPositionIndex[posIndex]] {
+                configureAndDisplayCardView(cardView: newView, atPosition: cardPos, animationDelay: startDelay, shouldFlip: true)
+            }
+            posIndex += 1
+            startDelay += animationConstant.dealInterval
+            
+//            addCardtoTable(forCard: eachcard)
 //            let newView = createCardView(forCard: eachcard)
 //            cardViews.append(newView)
         }
+        setNeedsLayout()
     }
     
     func removeCards(forCards removedCards: [Card]) {
@@ -129,11 +158,11 @@ class CardTableView: UIView {
     
     func setUpCardViews(with newCards: [Card], selectedCards: [Card], cardsMatch : Bool) {
         // set up views for new cards
-        if newCards.count > cards.count {
-            // we have new cards
-            let addedCards = newCards.subtracting(from: cards)
-            addCards(addedCards: addedCards)
-        }
+//        if newCards.count > cards.count {
+//            // we have new cards
+//            let addedCards = newCards.subtracting(from: cards)
+//            addCards(addedCards: addedCards)
+//        }
         
         // check to see if any cards/views are selected and/or matched
         for view in  cardViews {
@@ -173,19 +202,24 @@ class CardTableView: UIView {
     
     
     
-    private func configureAndDisplayCardView(cardView: SetCardView, atPosition position: CGRect) {
+    private func configureAndDisplayCardView(cardView: SetCardView, atPosition position: CGRect, animationDelay: Double, shouldFlip: Bool) {
         let insetOrigin = CGPoint(x: position.origin.x+tableConstant.cardInset, y: position.origin.y+tableConstant.cardInset)
         let insetSize = CGSize(width: position.width-(2*tableConstant.cardInset), height: position.height-(2*tableConstant.cardInset))
 
         cardView.isHidden = false
+//        cardView.isFaceUp = true
         
         // animate the arrangment
         
         UIViewPropertyAnimator.runningPropertyAnimator(
             withDuration: animationConstant.arrangeDuration,
-            delay: 0.0,
+            delay: animationDelay,
             options: UIView.AnimationOptions.curveEaseIn,
-            animations: {cardView.frame = CGRect(origin: insetOrigin, size: insetSize)})
+            animations: {cardView.frame = CGRect(origin: insetOrigin, size: insetSize)},
+            completion: {finished in
+                if shouldFlip {UIView.transition(with: cardView, duration: 1.0, options: [.transitionFlipFromTop], animations: {cardView.isFaceUp = true})}
+            })
+        
         
 //        UIView.transition(with: cardView,
 //                          duration: animationConstant.arrangeDuration,
@@ -219,12 +253,13 @@ class CardTableView: UIView {
         
         // layout the cards in the proper positions
 //        cardGrid.frame = self.bounds
-        cardGrid.frame = CGRect(x: self.bounds.minX, y: self.bounds.minY, width: self.bounds.width, height: self.bounds.height - dealDeckHeight - tableConstant.extraHeightGap)
-        cardGrid.cellCount = cards.count
-        
+        cardGrid.frame = CGRect(x: self.bounds.minX, y: self.bounds.minY, width: self.bounds.width, height: cardDecks!.frame.origin.y - tableConstant.extraHeightGap)
+//        cardGrid.cellCount = cards.count
+        cardGrid.cellCount = gridCount
+
         for index in 0..<cards.count {
             if let cardPos = cardGrid[index] {
-                configureAndDisplayCardView(cardView: cardViews[index], atPosition: cardPos)
+                configureAndDisplayCardView(cardView: cardViews[index], atPosition: cardPos, animationDelay: 0.0, shouldFlip: false)
             }
         }
         

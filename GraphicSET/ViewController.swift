@@ -29,6 +29,7 @@ class ViewController: UIViewController, HandleTouchedCard {
     @IBOutlet weak var deckButton: UIButton!
     @IBOutlet weak var discardDeck: UILabel!
     
+    @IBOutlet weak var CardDecks: UIStackView!
     @IBOutlet weak var scoreLabel: UILabel!
     
     @IBAction func newGameButton(_ sender: UIButton) {
@@ -38,7 +39,7 @@ class ViewController: UIViewController, HandleTouchedCard {
     }
     
     private struct displayConstant {
-            static let initialDeal = 12
+            static let initialDeal = 4
             static let selectBorderWidth: CGFloat =  3.0
             static let normalBorderWidth: CGFloat = 0.0
             static let selectBorderColor = UIColor.blue.cgColor
@@ -56,9 +57,12 @@ class ViewController: UIViewController, HandleTouchedCard {
         
         
         cardTable.touchDelegate = self
+        cardTable.cardDecks = CardDecks
         cardTable.dealDeckFrame = deckButton.frame
         cardTable.discardDeckFrame = discardDeck.frame
         cardTable.dealDeckHeight = deckButton.frame.height
+        cardTable.deckButton = deckButton
+        cardTable.discardLabel = discardDeck
 //        cardTable.gridFrame = CGRect(x: cardTable.frame.origin.x, y: cardTable.frame.origin.y, width: cardTable.frame.width, height: cardTable.frame.height - discardDeck.frame.height)
         // adjust height to allow for deal and discard decks
         setUpGame()
@@ -67,9 +71,9 @@ class ViewController: UIViewController, HandleTouchedCard {
 
     private func UpdateViewFromModel() {
         
-        cardTable.clearCardViews(with:cardsInPlay)
-        cardTable.setUpCardViews(with: cardsInPlay, selectedCards: theGame.cardsSelected, cardsMatch: theGame.selectedCardsAreAMatch)
-        cardTable.cards = cardsInPlay
+//        cardTable.clearCardViews(with:cardsInPlay)
+//        cardTable.setUpCardViews(with: cardsInPlay, selectedCards: theGame.cardsSelected, cardsMatch: theGame.selectedCardsAreAMatch)
+//        cardTable.cards = cardsInPlay
         cardTable.setNeedsDisplay()
         
         // update the score label
@@ -82,7 +86,7 @@ class ViewController: UIViewController, HandleTouchedCard {
         cardsInPlay.removeAll()     // clear all the cards from the table
         
         // deal the intial 12 cards to start the game
-
+        let cardPosition = [0,1,2,3,4,5,6,7,8,9,10,11]
         for cardCount in 0..<displayConstant.initialDeal {
             if let newCard = theGame.nextCard() {
                 cardsInPlay.append(newCard)
@@ -91,6 +95,7 @@ class ViewController: UIViewController, HandleTouchedCard {
                     print("Not enough cards for initial deal at card number: \(cardCount)")
                 }
             }
+        cardTable.addCards(addedCards: cardsInPlay, addPositionIndex: cardPosition)
     }
     
     
