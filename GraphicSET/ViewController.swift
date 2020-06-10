@@ -39,7 +39,7 @@ class ViewController: UIViewController, HandleTouchedCard {
     }
     
     private struct displayConstant {
-            static let initialDeal = 4
+            static let initialDeal = 6
             static let selectBorderWidth: CGFloat =  3.0
             static let normalBorderWidth: CGFloat = 0.0
             static let selectBorderColor = UIColor.blue.cgColor
@@ -74,7 +74,9 @@ class ViewController: UIViewController, HandleTouchedCard {
 //        cardTable.clearCardViews(with:cardsInPlay)
 //        cardTable.setUpCardViews(with: cardsInPlay, selectedCards: theGame.cardsSelected, cardsMatch: theGame.selectedCardsAreAMatch)
 //        cardTable.cards = cardsInPlay
-        cardTable.setNeedsDisplay()
+        
+        cardTable.showSelectedandHighlighted(forSelected: theGame.cardsSelected, cardsMatch: theGame.selectedCardsAreAMatch)
+//        cardTable.setNeedsDisplay()
         
         // update the score label
         
@@ -86,18 +88,31 @@ class ViewController: UIViewController, HandleTouchedCard {
         cardsInPlay.removeAll()     // clear all the cards from the table
         
         // deal the intial 12 cards to start the game
-        let cardPosition = [0,1,2,3,4,5,6,7,8,9,10,11]
+        var cardPosition: [Int] = []
         for cardCount in 0..<displayConstant.initialDeal {
             if let newCard = theGame.nextCard() {
+                cardPosition.append(cardCount)
                 cardsInPlay.append(newCard)
             } else {
                     // should not happen on initial deal
                     print("Not enough cards for initial deal at card number: \(cardCount)")
                 }
             }
-        cardTable.addCards(addedCards: cardsInPlay, addPositionIndex: cardPosition)
+        cardTable.addCards(addedCards: cardsInPlay, addPositionIndex: cardPosition, needsRelayout: true)
     }
     
+    private func getThreeNewCards() -> [Card]? {
+        var newCards: [Card] = []
+        var index = 0
+        repeat {
+            if let newCard = theGame.nextCard() {
+                newCards.append(newCard)
+                index += 1
+            }
+        } while (index < 3)
+        
+        return newCards
+    }
     
     // this function will attempt to deal 3 new cards based
     // on available space and available cards
@@ -118,29 +133,34 @@ class ViewController: UIViewController, HandleTouchedCard {
             break
         }
         if needCards {
-            var index = 0
-            repeat {
-                if let newCard = theGame.nextCard() {
-                    cardsInPlay.append(newCard)
-                } else {  // no more cards
-                    //disable swipe for new cards
-                    if swipe != nil {
-                        cardTable.removeGestureRecognizer(swipe!)
-                    }
+            let posIndex = cardsInPlay.count
+            var cardPos : [Int] = []
+            if let addCards = getThreeNewCards() {
+                let totalCards = posIndex + addCards.count
+                for index in posIndex..<totalCards {
+                    cardPos.append(index)
                 }
-                index += 1
-            } while (index < 3)
-            
-            UpdateViewFromModel()
+                cardsInPlay.append(contentsOf: addCards)
+                cardTable.addCards(addedCards: addCards, addPositionIndex: cardPos, needsRelayout: true)
+            } else {  // no more cards
+                //disable swipe for new cards
+                if swipe != nil {
+                    cardTable.removeGestureRecognizer(swipe!)
+                }
+            }
         }
     }
     
     func thisCardTouched(_ sender: SetCardView) {
+//      print("Card touched: \(sender.card?.description ?? "no card")")
         if sender.card != nil, let cardsMatched = theGame.chooseCard(forCard: sender.card!) {
-            
-            
-            clearMatchedCards(theCards: cardsMatched)
-            dealThreeCards(nil)
+            var cardPosition: [Int]?
+            cardPosition = cardTable.removeCards(theseCards: cardsMatched)
+            if let newCards = getThreeNewCards() {
+                cardTable.addCards(addedCards: newCards, addPositionIndex: cardPosition!,needsRelayout: false)
+            }
+//            clearMatchedCards(theCards: cardsMatched)
+//            dealThreeCards(nil)
         }
         UpdateViewFromModel()
 //        print("VC Card touched: \(sender.card?.description ?? "no card")")
@@ -163,8 +183,8 @@ class ViewController: UIViewController, HandleTouchedCard {
     private func clearMatchedCards(theCards:[Card]) {
        // take the matched cards and clear them as used and
        // remove them from the card table
-        cardTable.removeCards(forCards: theCards)
-        cardsInPlay = cardsInPlay.subtracting(from: theCards)
+//        cardTable.removeCards(forCards: theCards)
+//        cardsInPlay = cardsInPlay.subtracting(from: theCards)
 //       for theCard in theCards {
 //           if let crdIndex = cardsInPlay.firstIndex(of: theCard) {
 //            cardsInPlay.remove(at: crdIndex)

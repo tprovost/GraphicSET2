@@ -39,6 +39,7 @@ class CardTableView: UIView {
     private struct animationConstant {
         static let arrangeDuration = 3.0
         static let dealInterval = 1.0
+        static let flipDuration = 1.0
     }
     
     var cards = [Card]()
@@ -105,9 +106,13 @@ class CardTableView: UIView {
     private func getCardViewIndex(forCard: Card) -> Int? {
         return cardViews.firstIndex(where: {$0.card == forCard})
     }
-    
+    private func cardIndex(forCard: Card) -> Int? {
+        return cards.firstIndex(where: {$0 == forCard})
+    }
     func addCardtoTable(forCard: Card) {
         let newView = createCardView(forCard: forCard)
+        
+        // TODO: not this simple, need to add at a position
         cardViews.append(newView)
     }
     
@@ -115,21 +120,27 @@ class CardTableView: UIView {
         if let removeIndex = getCardViewIndex(forCard: forCard) {
         // TODO: check this and replace when doing the discard animation
         // it will be in the closing function for the animation
-                        cardViews[removeIndex].removeFromSuperview()
-                        cardViews.remove(at: removeIndex)
-                    }
+            cardViews[removeIndex].isHidden = true
+            //            cardViews[removeIndex].removeFromSuperview()
+//            cardViews.remove(at: removeIndex)
+            setNeedsDisplay()
+        }
     }
     
-    func addCards(addedCards: [Card], addPositionIndex: [Int]) {
+    func addCards(addedCards: [Card], addPositionIndex: [Int], needsRelayout: Bool) {
         // layout the existing cards based on leaving room for new cards
         var posIndex: Int = 0
-        gridCount += addedCards.count
-        setNeedsLayout()
-        layoutIfNeeded()
+        
+        if needsRelayout {
+            gridCount += addedCards.count
+            setNeedsLayout()
+            layoutIfNeeded()
+        }
         var startDelay : Double = 0.0
         for eachcard in addedCards {
             cards.append(eachcard)
             let newView = createCardView(forCard: eachcard)
+            // TODO: add at index, not just append?? or is this grid position?
             cardViews.append(newView)
             if let cardPos = cardGrid[addPositionIndex[posIndex]] {
                 configureAndDisplayCardView(cardView: newView, atPosition: cardPos, animationDelay: startDelay, shouldFlip: true)
@@ -141,19 +152,29 @@ class CardTableView: UIView {
 //            let newView = createCardView(forCard: eachcard)
 //            cardViews.append(newView)
         }
-        setNeedsLayout()
+//        setNeedsLayout()
     }
     
-    func removeCards(forCards removedCards: [Card]) {
+    func removeCards(theseCards removedCards: [Card]) -> [Int]? {
+        var cardPosition: [Int] = []
+        // get the positions of the cards removed
+        for eachCard in removedCards {
+            if let pos = getCardViewIndex(forCard: eachCard) {
+                cardPosition.append(pos)
+            }
+        }
         for eachCard in removedCards {
             removeCardfromTable(forCard: eachCard)
-//            if let removeIndex = getCardViewIndex(forCard: eachCard) {
-// TODO: check this and replace when doing the discard animation
-// it will be in the closing function for the animation
-//                cardViews[removeIndex].removeFromSuperview()
-//                cardViews.remove(at: removeIndex)
-//            }
+            if let index = cardIndex(forCard: eachCard) {
+                cards.remove(at: index)
+            }
         }
+        return cardPosition
+        
+        // TODO: check this and replace when doing the discard animation
+        // it will be in the closing function for the animation
+        //                cardViews[removeIndex].removeFromSuperview()
+        //                cardViews.remove(at: removeIndex)
     }
     
     func setUpCardViews(with newCards: [Card], selectedCards: [Card], cardsMatch : Bool) {
@@ -178,14 +199,28 @@ class CardTableView: UIView {
         }
     }
     
+    func showSelectedandHighlighted(forSelected selectedCards: [Card], cardsMatch: Bool){
+        for view in cardViews {
+            if selectedCards.contains(view.card!) {
+                view.selected()
+                if cardsMatch {
+                    view.cardBackground = UIColor.cyan
+                }
+            } else {
+                // unselect
+                view.unselect()
+            }
+        }
+    }
+    
     func clearCardViews(with newCards: [Card]){
         // find the difference in the card decks and deal with those only
         // compare our cards variable with the newCards
         
         if newCards.count < cards.count {
             // removed cards
-            let removedCards = cards.subtracting(from: newCards)
-            removeCards(forCards: removedCards)
+//            let removedCards = cards.subtracting(from: newCards)
+//            removeCards(forCards: removedCards)
         }
         
 //        for cardView in self.subviews {
@@ -217,7 +252,7 @@ class CardTableView: UIView {
             options: UIView.AnimationOptions.curveEaseIn,
             animations: {cardView.frame = CGRect(origin: insetOrigin, size: insetSize)},
             completion: {finished in
-                if shouldFlip {UIView.transition(with: cardView, duration: 1.0, options: [.transitionFlipFromTop], animations: {cardView.isFaceUp = true})}
+                if shouldFlip {UIView.transition(with: cardView, duration: animationConstant.flipDuration, options: [.transitionFlipFromTop], animations: {cardView.isFaceUp = true})}
             })
         
         
@@ -257,6 +292,8 @@ class CardTableView: UIView {
 //        cardGrid.cellCount = cards.count
         cardGrid.cellCount = gridCount
 
+        
+        // TODO: rethink layout based on needing to fill new cards into specific positions
         for index in 0..<cards.count {
             if let cardPos = cardGrid[index] {
                 configureAndDisplayCardView(cardView: cardViews[index], atPosition: cardPos, animationDelay: 0.0, shouldFlip: false)
