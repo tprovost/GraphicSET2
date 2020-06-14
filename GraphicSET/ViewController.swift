@@ -156,9 +156,9 @@ class ViewController: UIViewController, HandleTouchedCard {
         if sender.card != nil, let cardsMatched = theGame.chooseCard(forCard: sender.card!) {
             var cardPosition: [Int]?
             cardPosition = cardTable.removeCards(theseCards: cardsMatched)
-            if let newCards = getThreeNewCards() {
-                cardTable.addCards(addedCards: newCards, addPositionIndex: cardPosition!,needsRelayout: false)
-            }
+//            if let newCards = getThreeNewCards() {
+//                cardTable.addCards(addedCards: newCards, addPositionIndex: cardPosition!,needsRelayout: false)
+//            }
 //            clearMatchedCards(theCards: cardsMatched)
 //            dealThreeCards(nil)
         }

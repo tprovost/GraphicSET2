@@ -52,7 +52,12 @@ class CardTableView: UIView {
     var dealDeckFrame = CGRect()
     var discardDeckFrame = CGRect()
     var dealDeckHeight : CGFloat = 0.0
-    var gridCount : Int = 0
+    var gridCount : Int = 0 {
+        didSet {
+            print("grid count changed")
+            setNeedsLayout()
+        }
+    }
     
     
     private func createCardView(forCard theCard: Card) -> SetCardView {
@@ -116,24 +121,14 @@ class CardTableView: UIView {
         cardViews.append(newView)
     }
     
-    func removeCardfromTable(forCard: Card) {
-        if let removeIndex = getCardViewIndex(forCard: forCard) {
-        // TODO: check this and replace when doing the discard animation
-        // it will be in the closing function for the animation
-            cardViews[removeIndex].isHidden = true
-            //            cardViews[removeIndex].removeFromSuperview()
-//            cardViews.remove(at: removeIndex)
-            setNeedsDisplay()
-        }
-    }
+ 
     
     func addCards(addedCards: [Card], addPositionIndex: [Int], needsRelayout: Bool) {
-        // layout the existing cards based on leaving room for new cards
         var posIndex: Int = 0
-        
+        print("---- Add Cards ----")
         if needsRelayout {
             gridCount += addedCards.count
-            setNeedsLayout()
+//            setNeedsLayout()
             layoutIfNeeded()
         }
         var startDelay : Double = 0.0
@@ -154,10 +149,35 @@ class CardTableView: UIView {
         }
 //        setNeedsLayout()
     }
-    
+   func removeCardfromTable(forCard: Card) {
+        if let removeIndex = getCardViewIndex(forCard: forCard) {
+            let cardView = cardViews[removeIndex]
+            let discardOrigin =  CGPoint(x: cardDecks!.frame.origin.x + discardLabel!.frame.origin.x, y: cardDecks!.frame.origin.y)
+            let discardFrame = CGRect(origin: discardOrigin, size: discardLabel!.frame.size)
+            print("-- Remove card \(forCard.description) to \(discardFrame)")
+            UIViewPropertyAnimator.runningPropertyAnimator(
+                withDuration: animationConstant.arrangeDuration,
+                delay: 0.0,
+                options: UIView.AnimationOptions.curveEaseOut,
+                animations: {cardView.frame = discardFrame},
+                completion: {finished in
+                    UIView.transition(with: cardView, duration: animationConstant.flipDuration, options: [.transitionFlipFromTop], animations: {cardView.isFaceUp = false})}
+                )
+            }
+        // TODO: check this and replace when doing the discard animation
+        // it will be in the closing function for the animation
+//            cardViews[removeIndex].isHidden = true
+//            cardViews[removeIndex].isUserInteractionEnabled = false
+//            cardViews[removeIndex].isFaceUp = false
+//          cardViews[removeIndex].removeFromSuperview()
+//          cardViews.remove(at: removeIndex)
+//            setNeedsDisplay()
+    }
+
     func removeCards(theseCards removedCards: [Card]) -> [Int]? {
         var cardPosition: [Int] = []
         // get the positions of the cards removed
+        print("----- Remove Cards")
         for eachCard in removedCards {
             if let pos = getCardViewIndex(forCard: eachCard) {
                 cardPosition.append(pos)
@@ -177,34 +197,13 @@ class CardTableView: UIView {
         //                cardViews.remove(at: removeIndex)
     }
     
-    func setUpCardViews(with newCards: [Card], selectedCards: [Card], cardsMatch : Bool) {
-        // set up views for new cards
-//        if newCards.count > cards.count {
-//            // we have new cards
-//            let addedCards = newCards.subtracting(from: cards)
-//            addCards(addedCards: addedCards)
-//        }
-        
-        // check to see if any cards/views are selected and/or matched
-        for view in  cardViews {
-            if selectedCards.contains(view.card!) {
-                view.selected()
-                if cardsMatch {
-                    view.cardBackground = UIColor.cyan
-                }
-            } else {
-                // unselect
-                view.unselect()
-            }
-        }
-    }
-    
     func showSelectedandHighlighted(forSelected selectedCards: [Card], cardsMatch: Bool){
         for view in cardViews {
             if selectedCards.contains(view.card!) {
                 view.selected()
                 if cardsMatch {
-                    view.cardBackground = UIColor.cyan
+//                    view.cardBackground = UIColor.cyan
+                    view.highlighted()
                 }
             } else {
                 // unselect
@@ -212,30 +211,6 @@ class CardTableView: UIView {
             }
         }
     }
-    
-    func clearCardViews(with newCards: [Card]){
-        // find the difference in the card decks and deal with those only
-        // compare our cards variable with the newCards
-        
-        if newCards.count < cards.count {
-            // removed cards
-//            let removedCards = cards.subtracting(from: newCards)
-//            removeCards(forCards: removedCards)
-        }
-        
-//        for cardView in self.subviews {
-//            if let gestureRecognizers = cardView.gestureRecognizers {
-//                for gestureRecognizer in gestureRecognizers {
-//                    cardView.removeGestureRecognizer(gestureRecognizer)
-//                }
-//            }
-//            cardView.removeFromSuperview()
-//        }
-//        cardViews.removeAll()
-    }
-    
-    
-    
     
     private func configureAndDisplayCardView(cardView: SetCardView, atPosition position: CGRect, animationDelay: Double, shouldFlip: Bool) {
         let insetOrigin = CGPoint(x: position.origin.x+tableConstant.cardInset, y: position.origin.y+tableConstant.cardInset)
@@ -254,11 +229,6 @@ class CardTableView: UIView {
             completion: {finished in
                 if shouldFlip {UIView.transition(with: cardView, duration: animationConstant.flipDuration, options: [.transitionFlipFromTop], animations: {cardView.isFaceUp = true})}
             })
-        
-        
-//        UIView.transition(with: cardView,
-//                          duration: animationConstant.arrangeDuration,
-//                          options: UIView.AnimationOptions.curveEaseIn, animations: {cardView.frame = CGRect(origin: insetOrigin, size: insetSize)})
     }
     
     /*
@@ -290,6 +260,8 @@ class CardTableView: UIView {
 //        cardGrid.frame = self.bounds
         cardGrid.frame = CGRect(x: self.bounds.minX, y: self.bounds.minY, width: self.bounds.width, height: cardDecks!.frame.origin.y - tableConstant.extraHeightGap)
 //        cardGrid.cellCount = cards.count
+        
+        print("Layout table with \(gridCount) cells and \(cards.count) cards")
         cardGrid.cellCount = gridCount
 
         

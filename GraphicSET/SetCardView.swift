@@ -11,16 +11,16 @@ import UIKit
 class SetCardView: UIView {
 
     var cardBackground : UIColor = symbolValues.backColor {
-        didSet { setNeedsDisplay(); setNeedsLayout() }
+        didSet { setNeedsDisplay() }
     }
     var symbol : Card.Symbol = Card.Symbol.diamond {
-        didSet { setNeedsDisplay(); setNeedsLayout() }
+        didSet { setNeedsDisplay() }
     }
     var shading : Card.Shading = Card.Shading.open {
-        didSet { setNeedsDisplay(); setNeedsLayout() }
+        didSet { setNeedsDisplay();}
     }
     var color : Card.ShapeColor = Card.ShapeColor.red {
-        didSet { setNeedsDisplay(); setNeedsLayout() }
+        didSet { setNeedsDisplay();}
     }
     var number : Int = 1 {
         didSet { setNeedsDisplay(); setNeedsLayout() }
@@ -28,10 +28,10 @@ class SetCardView: UIView {
     var drawColor : UIColor = UIColor.black
     
     var backColor : UIColor = UIColor.white {
-        didSet { setNeedsDisplay(); setNeedsLayout() }
+        didSet { setNeedsDisplay() }
     }
     var card : Card? = nil {
-        didSet { setNeedsDisplay(); setNeedsLayout() }
+        didSet { setNeedsDisplay() }
     }
     var isFaceUp = true {
         didSet { setNeedsDisplay()}
@@ -172,7 +172,9 @@ extension SetCardView {
         self.layer.borderColor = cardAttributes.normalBorderColor
     }
     func highlighted() {
-        self.backColor = cardAttributes.highlightBackground
+//        self.backColor = cardAttributes.highlightBackground
+        self.cardBackground = cardAttributes.highlightBackground
+
     }
     
     private var symbolWidth: CGFloat {
