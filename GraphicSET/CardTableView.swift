@@ -40,6 +40,7 @@ class CardTableView: UIView {
         static let arrangeDuration = 3.0
         static let dealInterval = 1.0
         static let flipDuration = 1.0
+        static let discardSpacing = 1.0
     }
     
     var cards = [Card]()
@@ -54,11 +55,17 @@ class CardTableView: UIView {
     var dealDeckHeight : CGFloat = 0.0
     var gridCount : Int = 0 {
         didSet {
-            print("grid count changed")
+//            print("grid count changed")
             setNeedsLayout()
         }
     }
     
+    lazy var discardOrigin =  CGPoint(x: cardDecks!.frame.origin.x + discardLabel!.frame.origin.x, y: cardDecks!.frame.origin.y)
+    lazy var discardFrame = CGRect(origin: discardOrigin, size: discardLabel!.frame.size)
+    
+    lazy var animator = UIDynamicAnimator(referenceView: self)
+    
+    lazy var cardBehavior = CardBehavior(in: animator)
     
     private func createCardView(forCard theCard: Card) -> SetCardView {
         let cardView = SetCardView()
@@ -121,48 +128,58 @@ class CardTableView: UIView {
         cardViews.append(newView)
     }
     
- 
-    
-    func addCards(addedCards: [Card], addPositionIndex: [Int], needsRelayout: Bool) {
-        var posIndex: Int = 0
-        print("---- Add Cards ----")
-        if needsRelayout {
-            gridCount += addedCards.count
-//            setNeedsLayout()
-            layoutIfNeeded()
-        }
+    func addCards(addedCards: [Card]) {
+        var cardPos = gridCount
+        gridCount += addedCards.count
+        layoutIfNeeded()
         var startDelay : Double = 0.0
         for eachcard in addedCards {
-            cards.append(eachcard)
             let newView = createCardView(forCard: eachcard)
-            // TODO: add at index, not just append?? or is this grid position?
             cardViews.append(newView)
-            if let cardPos = cardGrid[addPositionIndex[posIndex]] {
-                configureAndDisplayCardView(cardView: newView, atPosition: cardPos, animationDelay: startDelay, shouldFlip: true)
-            }
-            posIndex += 1
+            configureAndDisplayCardView(cardView: newView, atPosition: cardGrid[cardPos]!, animationDelay: startDelay, shouldFlip: true)
+            cardPos += 1
             startDelay += animationConstant.dealInterval
-            
-//            addCardtoTable(forCard: eachcard)
-//            let newView = createCardView(forCard: eachcard)
-//            cardViews.append(newView)
         }
-//        setNeedsLayout()
     }
-   func removeCardfromTable(forCard: Card) {
+    
+    private func flyAwayCard(forCard card: Card, inDirection: CardBehavior.pushDirection) {
+        if let flyCard = getCardView(forCard: card)
+        {
+            cardBehavior.addItem(flyCard, inDirection: inDirection)
+        }
+    }
+    
+    private func sendCardtoDiscard(cardView: SetCardView, withDelay: Double) {
+        UIViewPropertyAnimator.runningPropertyAnimator(
+        withDuration: animationConstant.arrangeDuration,
+        delay: withDelay,
+        options: UIView.AnimationOptions.curveEaseOut,
+        animations: {cardView.frame = self.discardFrame},
+        completion: {finished in
+            UIView.transition(with: cardView, duration: animationConstant.flipDuration, options: [.transitionFlipFromTop], animations: {cardView.isFaceUp = false})
+            cardView.isHidden = true
+//            cardView.removeFromSuperview()
+//            self.cardViews.removeAll(where: {$0 == cardView})
+            }
+        )
+    }
+    
+    func removeCardfromTable(forCard: Card, delayAnimationFor animDelay: Double) {
         if let removeIndex = getCardViewIndex(forCard: forCard) {
             let cardView = cardViews[removeIndex]
-            let discardOrigin =  CGPoint(x: cardDecks!.frame.origin.x + discardLabel!.frame.origin.x, y: cardDecks!.frame.origin.y)
-            let discardFrame = CGRect(origin: discardOrigin, size: discardLabel!.frame.size)
-            print("-- Remove card \(forCard.description) to \(discardFrame)")
-            UIViewPropertyAnimator.runningPropertyAnimator(
-                withDuration: animationConstant.arrangeDuration,
-                delay: 0.0,
-                options: UIView.AnimationOptions.curveEaseOut,
-                animations: {cardView.frame = discardFrame},
-                completion: {finished in
-                    UIView.transition(with: cardView, duration: animationConstant.flipDuration, options: [.transitionFlipFromTop], animations: {cardView.isFaceUp = false})}
-                )
+            sendCardtoDiscard(cardView: cardView, withDelay: 0.5)
+//            cardView.removeFromSuperview()
+            cardViews.remove(at: removeIndex)
+
+//            print("-- Remove card \(forCard.description) to \(discardFrame)")
+           
+            // animate the flyaway for this card
+//            cardBehavior.addItem(cardView, inDirection:CardBehavior.pushDirection.left)
+            
+//            let animTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(animFinish), userInfo: cardView, repeats: false)
+            
+
+//
             }
         // TODO: check this and replace when doing the discard animation
         // it will be in the closing function for the animation
@@ -173,23 +190,48 @@ class CardTableView: UIView {
 //          cardViews.remove(at: removeIndex)
 //            setNeedsDisplay()
     }
+    
+   
+    
+    @objc func animFinish(theTimer: Timer) {
+//       cardBehavior.collisionBehavior.collisionMode.update(with: UICollisionBehavior.Mode.boundaries)
+        var animDelay = animationConstant.discardSpacing
+        if let cards:[Card] = theTimer.userInfo as? [Card] {
+            for card in cards {
+                if let cvIndex = getCardViewIndex(forCard: card) {
+                    let cardView = cardViews[cvIndex]
+//                    cardBehavior.removeItem(cardView)
+                    sendCardtoDiscard(cardView: cardView, withDelay: animDelay)
+                    animDelay += animationConstant.discardSpacing
+                }
+            }
+        }
+    }
+    
+    private func nextDirection(currentDirection: CardBehavior.pushDirection) -> CardBehavior.pushDirection {
+        switch currentDirection {
+        case .left:
+            return .right
+        case .right:
+            return .up
+        case .up:
+            return .left
+        }
+    }
 
-    func removeCards(theseCards removedCards: [Card]) -> [Int]? {
-        var cardPosition: [Int] = []
-        // get the positions of the cards removed
-        print("----- Remove Cards")
+    func removeCards(theseCards removedCards: [Card]) {
+//        var flyDirection: CardBehavior.pushDirection = .left
         for eachCard in removedCards {
-            if let pos = getCardViewIndex(forCard: eachCard) {
-                cardPosition.append(pos)
-            }
+            removeCardfromTable(forCard: eachCard, delayAnimationFor: 0.0)
+//            flyAwayCard(forCard: eachCard, inDirection: flyDirection)
+//            flyDirection = nextDirection(currentDirection: flyDirection)
         }
-        for eachCard in removedCards {
-            removeCardfromTable(forCard: eachCard)
-            if let index = cardIndex(forCard: eachCard) {
-                cards.remove(at: index)
-            }
-        }
-        return cardPosition
+        
+//        let animTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(animFinish), userInfo: removedCards, repeats: false)
+
+        
+        gridCount -= removedCards.count
+        layoutIfNeeded()
         
         // TODO: check this and replace when doing the discard animation
         // it will be in the closing function for the animation
@@ -261,12 +303,9 @@ class CardTableView: UIView {
         cardGrid.frame = CGRect(x: self.bounds.minX, y: self.bounds.minY, width: self.bounds.width, height: cardDecks!.frame.origin.y - tableConstant.extraHeightGap)
 //        cardGrid.cellCount = cards.count
         
-        print("Layout table with \(gridCount) cells and \(cards.count) cards")
         cardGrid.cellCount = gridCount
 
-        
-        // TODO: rethink layout based on needing to fill new cards into specific positions
-        for index in 0..<cards.count {
+        for index in 0..<cardViews.count {
             if let cardPos = cardGrid[index] {
                 configureAndDisplayCardView(cardView: cardViews[index], atPosition: cardPos, animationDelay: 0.0, shouldFlip: false)
             }

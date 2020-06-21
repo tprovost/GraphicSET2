@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E0AAE24E249969090031F7CB /* CardBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0AAE24D249969090031F7CB /* CardBehavior.swift */; };
 		E0B7F9712464F48B00542102 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B7F9702464F48B00542102 /* AppDelegate.swift */; };
 		E0B7F9732464F48B00542102 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B7F9722464F48B00542102 /* SceneDelegate.swift */; };
 		E0B7F9752464F48B00542102 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B7F9742464F48B00542102 /* ViewController.swift */; };
@@ -41,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E0AAE24D249969090031F7CB /* CardBehavior.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CardBehavior.swift; path = "../../../Google Drive/Development/PlayingCard L8/PlayingCard/CardBehavior.swift"; sourceTree = "<group>"; };
 		E0B7F96D2464F48B00542102 /* GraphicSET.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GraphicSET.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0B7F9702464F48B00542102 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E0B7F9722464F48B00542102 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 				E0B7F9702464F48B00542102 /* AppDelegate.swift */,
 				E0B7F9722464F48B00542102 /* SceneDelegate.swift */,
 				E0B7F9742464F48B00542102 /* ViewController.swift */,
+				E0AAE24D249969090031F7CB /* CardBehavior.swift */,
 				E0B7F9762464F48B00542102 /* Main.storyboard */,
 				E0B7F9A62464F78E00542102 /* SetCardView.swift */,
 				E0B7F9A82465B97700542102 /* CardTableView.swift */,
@@ -280,6 +283,7 @@
 				E0B7F9A12464F54800542102 /* Set.swift in Sources */,
 				E0B7F9752464F48B00542102 /* ViewController.swift in Sources */,
 				E0B7F9A72464F78E00542102 /* SetCardView.swift in Sources */,
+				E0AAE24E249969090031F7CB /* CardBehavior.swift in Sources */,
 				E0B7F9A92465B97700542102 /* CardTableView.swift in Sources */,
 				E0B7F9A32464F5ED00542102 /* Card.swift in Sources */,
 				E0B7F9712464F48B00542102 /* AppDelegate.swift in Sources */,

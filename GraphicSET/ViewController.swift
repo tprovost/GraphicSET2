@@ -51,6 +51,7 @@ class ViewController: UIViewController, HandleTouchedCard {
    
     var cardsInPlay = [Card]()
     private lazy var theGame = SetGame()
+    var setsMatched = 0
     
     override func viewDidLoad() {
        super.viewDidLoad()
@@ -81,6 +82,7 @@ class ViewController: UIViewController, HandleTouchedCard {
         // update the score label
         
         scoreLabel.text = "Score: \(theGame.theScore)"
+        discardDeck.text  = "\(setsMatched) Sets"
     }
     
     private func setUpGame() {
@@ -98,7 +100,8 @@ class ViewController: UIViewController, HandleTouchedCard {
                     print("Not enough cards for initial deal at card number: \(cardCount)")
                 }
             }
-        cardTable.addCards(addedCards: cardsInPlay, addPositionIndex: cardPosition, needsRelayout: true)
+        cardTable.addCards(addedCards: cardsInPlay)
+        setsMatched = 0
     }
     
     private func getThreeNewCards() -> [Card]? {
@@ -133,15 +136,9 @@ class ViewController: UIViewController, HandleTouchedCard {
             break
         }
         if needCards {
-            let posIndex = cardsInPlay.count
-            var cardPos : [Int] = []
             if let addCards = getThreeNewCards() {
-                let totalCards = posIndex + addCards.count
-                for index in posIndex..<totalCards {
-                    cardPos.append(index)
-                }
                 cardsInPlay.append(contentsOf: addCards)
-                cardTable.addCards(addedCards: addCards, addPositionIndex: cardPos, needsRelayout: true)
+                cardTable.addCards(addedCards: addCards)
             } else {  // no more cards
                 //disable swipe for new cards
                 if swipe != nil {
@@ -154,12 +151,12 @@ class ViewController: UIViewController, HandleTouchedCard {
     func thisCardTouched(_ sender: SetCardView) {
 //      print("Card touched: \(sender.card?.description ?? "no card")")
         if sender.card != nil, let cardsMatched = theGame.chooseCard(forCard: sender.card!) {
-            var cardPosition: [Int]?
-            cardPosition = cardTable.removeCards(theseCards: cardsMatched)
-//            if let newCards = getThreeNewCards() {
-//                cardTable.addCards(addedCards: newCards, addPositionIndex: cardPosition!,needsRelayout: false)
-//            }
-//            clearMatchedCards(theCards: cardsMatched)
+            cardTable.removeCards(theseCards: cardsMatched)
+            setsMatched += 1
+            if let newCards = getThreeNewCards() {
+                cardTable.addCards(addedCards: newCards)
+            }
+            clearMatchedCards(theCards: cardsMatched)
 //            dealThreeCards(nil)
         }
         UpdateViewFromModel()
