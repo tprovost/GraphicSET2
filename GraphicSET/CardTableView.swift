@@ -151,24 +151,22 @@ class CardTableView: UIView {
     
     private func sendCardtoDiscard(cardView: SetCardView, withDelay: Double) {
         UIViewPropertyAnimator.runningPropertyAnimator(
-        withDuration: animationConstant.arrangeDuration,
-        delay: withDelay,
-        options: UIView.AnimationOptions.curveEaseOut,
-        animations: {cardView.frame = self.discardFrame},
-        completion: {finished in
-            UIView.transition(with: cardView, duration: animationConstant.flipDuration, options: [.transitionFlipFromTop], animations: {cardView.isFaceUp = false})
-            cardView.isHidden = true
-//            cardView.removeFromSuperview()
-//            self.cardViews.removeAll(where: {$0 == cardView})
-            }
+            withDuration: animationConstant.arrangeDuration,
+            delay: withDelay,
+            options: UIView.AnimationOptions.curveEaseOut,
+            animations: {cardView.frame = self.discardFrame},
+            completion: {finished in
+                UIView.transition(with: cardView, duration: animationConstant.flipDuration, options: [.transitionFlipFromTop], animations: {cardView.isFaceUp = false})
+                cardView.isHidden = true
+    //            cardView.removeFromSuperview()
+                }
         )
     }
     
     func removeCardfromTable(forCard: Card, delayAnimationFor animDelay: Double) {
         if let removeIndex = getCardViewIndex(forCard: forCard) {
-            let cardView = cardViews[removeIndex]
-            sendCardtoDiscard(cardView: cardView, withDelay: 0.5)
-//            cardView.removeFromSuperview()
+//            let cardView = cardViews[removeIndex]
+//            sendCardtoDiscard(cardView: cardView, withDelay: 0.5)
             cardViews.remove(at: removeIndex)
 
 //            print("-- Remove card \(forCard.description) to \(discardFrame)")
@@ -194,16 +192,13 @@ class CardTableView: UIView {
    
     
     @objc func animFinish(theTimer: Timer) {
-//       cardBehavior.collisionBehavior.collisionMode.update(with: UICollisionBehavior.Mode.boundaries)
+       cardBehavior.collisionBehavior.collisionMode.update(with: UICollisionBehavior.Mode.boundaries)
         var animDelay = animationConstant.discardSpacing
-        if let cards:[Card] = theTimer.userInfo as? [Card] {
-            for card in cards {
-                if let cvIndex = getCardViewIndex(forCard: card) {
-                    let cardView = cardViews[cvIndex]
-//                    cardBehavior.removeItem(cardView)
-                    sendCardtoDiscard(cardView: cardView, withDelay: animDelay)
-                    animDelay += animationConstant.discardSpacing
-                }
+        if let cardViews:[SetCardView] = theTimer.userInfo as? [SetCardView] {
+            for view in cardViews {
+                cardBehavior.removeItem(view)
+                sendCardtoDiscard(cardView: view, withDelay: animDelay)
+                animDelay += animationConstant.discardSpacing
             }
         }
     }
@@ -220,14 +215,19 @@ class CardTableView: UIView {
     }
 
     func removeCards(theseCards removedCards: [Card]) {
-//        var flyDirection: CardBehavior.pushDirection = .left
+        var flyDirection: CardBehavior.pushDirection = .left
+        var removedViews = [SetCardView]()
         for eachCard in removedCards {
+            if let removedIndex = getCardViewIndex(forCard: eachCard) {
+                removedViews.append(cardViews[removedIndex])
+            }
+            flyAwayCard(forCard: eachCard, inDirection: flyDirection)
+               flyDirection = flyDirection.next()
+            
             removeCardfromTable(forCard: eachCard, delayAnimationFor: 0.0)
-//            flyAwayCard(forCard: eachCard, inDirection: flyDirection)
-//            flyDirection = nextDirection(currentDirection: flyDirection)
         }
         
-//        let animTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(animFinish), userInfo: removedCards, repeats: false)
+        let animTimer = Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(animFinish), userInfo: removedViews, repeats: false)
 
         
         gridCount -= removedCards.count

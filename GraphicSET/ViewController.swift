@@ -72,14 +72,9 @@ class ViewController: UIViewController, HandleTouchedCard {
 
     private func UpdateViewFromModel() {
         
-//        cardTable.clearCardViews(with:cardsInPlay)
-//        cardTable.setUpCardViews(with: cardsInPlay, selectedCards: theGame.cardsSelected, cardsMatch: theGame.selectedCardsAreAMatch)
-//        cardTable.cards = cardsInPlay
-        
         cardTable.showSelectedandHighlighted(forSelected: theGame.cardsSelected, cardsMatch: theGame.selectedCardsAreAMatch)
-//        cardTable.setNeedsDisplay()
-        
-        // update the score label
+
+        // update the score and set labels
         
         scoreLabel.text = "Score: \(theGame.theScore)"
         discardDeck.text  = "\(setsMatched) Sets"
