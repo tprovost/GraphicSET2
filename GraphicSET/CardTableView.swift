@@ -37,10 +37,11 @@ class CardTableView: UIView {
     }
     
     private struct animationConstant {
-        static let arrangeDuration = 3.0
-        static let dealInterval = 1.0
-        static let flipDuration = 1.0
+        static let arrangeDuration = 2.0
+        static let dealInterval = 0.5
+        static let flipDuration = 0.5
         static let discardSpacing = 1.0
+        static let flyawayDuration = 2.0
     }
     
     var cards = [Card]()
@@ -59,9 +60,6 @@ class CardTableView: UIView {
             setNeedsLayout()
         }
     }
-    
-    lazy var discardOrigin =  CGPoint(x: cardDecks!.frame.origin.x + discardLabel!.frame.origin.x, y: cardDecks!.frame.origin.y)
-    lazy var discardFrame = CGRect(origin: discardOrigin, size: discardLabel!.frame.size)
     
     lazy var animator = UIDynamicAnimator(referenceView: self)
     
@@ -149,12 +147,18 @@ class CardTableView: UIView {
         }
     }
     
+    // TODO: Fix discard pile frame so it works when the device is rotated
+    
+    
     private func sendCardtoDiscard(cardView: SetCardView, withDelay: Double) {
+        let discardOrigin =  CGPoint(x: cardDecks!.frame.origin.x + discardLabel!.frame.origin.x, y: cardDecks!.frame.origin.y)
+        let discardFrame = CGRect(origin: discardOrigin, size: discardLabel!.frame.size)
+        
         UIViewPropertyAnimator.runningPropertyAnimator(
             withDuration: animationConstant.arrangeDuration,
             delay: withDelay,
             options: UIView.AnimationOptions.curveEaseOut,
-            animations: {cardView.frame = self.discardFrame},
+            animations: {cardView.frame = discardFrame},
             completion: {finished in
                 UIView.transition(with: cardView, duration: animationConstant.flipDuration, options: [.transitionFlipFromTop], animations: {cardView.isFaceUp = false})
                 cardView.isHidden = true
@@ -163,31 +167,11 @@ class CardTableView: UIView {
         )
     }
     
-    func removeCardfromTable(forCard: Card, delayAnimationFor animDelay: Double) {
-        if let removeIndex = getCardViewIndex(forCard: forCard) {
-//            let cardView = cardViews[removeIndex]
-//            sendCardtoDiscard(cardView: cardView, withDelay: 0.5)
-            cardViews.remove(at: removeIndex)
-
-//            print("-- Remove card \(forCard.description) to \(discardFrame)")
-           
-            // animate the flyaway for this card
-//            cardBehavior.addItem(cardView, inDirection:CardBehavior.pushDirection.left)
-            
-//            let animTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(animFinish), userInfo: cardView, repeats: false)
-            
-
-//
-            }
-        // TODO: check this and replace when doing the discard animation
-        // it will be in the closing function for the animation
-//            cardViews[removeIndex].isHidden = true
-//            cardViews[removeIndex].isUserInteractionEnabled = false
-//            cardViews[removeIndex].isFaceUp = false
-//          cardViews[removeIndex].removeFromSuperview()
-//          cardViews.remove(at: removeIndex)
-//            setNeedsDisplay()
-    }
+//    func removeCardfromTable(forCard: Card, delayAnimationFor animDelay: Double) {
+//        if let removeIndex = getCardViewIndex(forCard: forCard) {
+//            cardViews.remove(at: removeIndex)
+//        }
+//    }
     
    
     
@@ -203,17 +187,6 @@ class CardTableView: UIView {
         }
     }
     
-    private func nextDirection(currentDirection: CardBehavior.pushDirection) -> CardBehavior.pushDirection {
-        switch currentDirection {
-        case .left:
-            return .right
-        case .right:
-            return .up
-        case .up:
-            return .left
-        }
-    }
-
     func removeCards(theseCards removedCards: [Card]) {
         var flyDirection: CardBehavior.pushDirection = .left
         var removedViews = [SetCardView]()
@@ -224,10 +197,13 @@ class CardTableView: UIView {
             flyAwayCard(forCard: eachCard, inDirection: flyDirection)
                flyDirection = flyDirection.next()
             
-            removeCardfromTable(forCard: eachCard, delayAnimationFor: 0.0)
+            if let removeIndex = getCardViewIndex(forCard: eachCard) {
+                cardViews.remove(at: removeIndex)
+            }
+//            removeCardfromTable(forCard: eachCard, delayAnimationFor: 0.0)
         }
         
-        let animTimer = Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(animFinish), userInfo: removedViews, repeats: false)
+        _ = Timer.scheduledTimer(timeInterval: animationConstant.flyawayDuration, target: self, selector: #selector(animFinish), userInfo: removedViews, repeats: false)
 
         
         gridCount -= removedCards.count

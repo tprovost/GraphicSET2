@@ -25,6 +25,7 @@ class ViewController: UIViewController, HandleTouchedCard {
         }
     }
     @IBAction func dealButton(_ sender: UIButton) {
+        dealThreeCards(nil)
     }
     @IBOutlet weak var deckButton: UIButton!
     @IBOutlet weak var discardDeck: UILabel!
@@ -39,7 +40,7 @@ class ViewController: UIViewController, HandleTouchedCard {
     }
     
     private struct displayConstant {
-            static let initialDeal = 6
+            static let initialDeal = 12
             static let selectBorderWidth: CGFloat =  3.0
             static let normalBorderWidth: CGFloat = 0.0
             static let selectBorderColor = UIColor.blue.cgColor
@@ -121,14 +122,16 @@ class ViewController: UIViewController, HandleTouchedCard {
         
         var needCards = true
         
-        switch sender?.state {
-        case .ended:
-            needCards = true
-        case .cancelled:
-            needCards = false
-        default:
-            needCards = false
-            break
+        if sender != nil {
+            switch sender?.state {
+            case .ended:
+                needCards = true
+            case .cancelled:
+                needCards = false
+            default:
+                needCards = false
+                break
+            }
         }
         if needCards {
             if let addCards = getThreeNewCards() {
@@ -139,6 +142,8 @@ class ViewController: UIViewController, HandleTouchedCard {
                 if swipe != nil {
                     cardTable.removeGestureRecognizer(swipe!)
                 }
+                // diable deal button
+                deckButton.isEnabled = false
             }
         }
     }
