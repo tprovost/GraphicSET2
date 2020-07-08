@@ -51,31 +51,32 @@
                                             <constraint firstAttribute="bottom" secondItem="Ezf-H5-Bpv" secondAttribute="bottom" constant="8" id="lbG-z6-7lO"/>
                                         </constraints>
                                     </view>
-                                    <stackView opaque="NO" contentMode="scaleAspectFit" distribution="equalSpacing" spacing="255" translatesAutoresizingMaskIntoConstraints="NO" id="YND-Sf-rE7">
+                                    <stackView opaque="NO" contentMode="scaleAspectFit" distribution="equalSpacing" spacing="255" translatesAutoresizingMaskIntoConstraints="NO" id="YND-Sf-rE7" userLabel="NewGame-Score">
                                         <rect key="frame" x="0.0" y="775" width="398" height="35"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9cG-in-GRk">
-                                                <rect key="frame" x="0.0" y="0.0" width="71.5" height="35"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="71" height="35"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="35" id="mj7-IF-74b"/>
                                                 </constraints>
-                                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <state key="normal" title="New Game"/>
                                                 <connections>
                                                     <action selector="newGameButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="AJa-hb-UB4"/>
                                                 </connections>
                                             </button>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Score" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dAX-Gv-7Mg">
-                                                <rect key="frame" x="326.5" y="0.0" width="71.5" height="35"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Score: 00" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="120.5" translatesAutoresizingMaskIntoConstraints="NO" id="dAX-Gv-7Mg">
+                                                <rect key="frame" x="331.5" y="0.0" width="66.5" height="35"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="35" id="0fq-XH-yG5"/>
                                                 </constraints>
-                                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                         </subviews>
                                         <constraints>
+                                            <constraint firstItem="dAX-Gv-7Mg" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="9cG-in-GRk" secondAttribute="trailing" constant="8" symbolic="YES" id="Vbm-IV-WPi"/>
                                             <constraint firstItem="9cG-in-GRk" firstAttribute="centerY" secondItem="YND-Sf-rE7" secondAttribute="centerY" id="aWQ-M7-S4q"/>
                                             <constraint firstItem="dAX-Gv-7Mg" firstAttribute="centerY" secondItem="YND-Sf-rE7" secondAttribute="centerY" id="oQy-PS-dsN"/>
                                         </constraints>

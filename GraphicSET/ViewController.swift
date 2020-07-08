@@ -50,7 +50,7 @@ class ViewController: UIViewController, HandleTouchedCard {
             static let rotationAmount: CGFloat = CGFloat.pi / 2.0
     }
    
-    var cardsInPlay = [Card]()
+    var cardsInPlay = [SetCard]()
     private lazy var theGame = SetGame()
     var setsMatched = 0
     
@@ -100,8 +100,8 @@ class ViewController: UIViewController, HandleTouchedCard {
         setsMatched = 0
     }
     
-    private func getThreeNewCards() -> [Card]? {
-        var newCards: [Card] = []
+    private func getThreeNewCards() -> [SetCard]? {
+        var newCards: [SetCard] = []
         var index = 0
         repeat {
             if let newCard = theGame.nextCard() {
@@ -177,7 +177,7 @@ class ViewController: UIViewController, HandleTouchedCard {
         
     }
     
-    private func clearMatchedCards(theCards:[Card]) {
+    private func clearMatchedCards(theCards:[SetCard]) {
        // take the matched cards and clear them as used and
        // remove them from the card table
 //        cardTable.removeCards(forCards: theCards)

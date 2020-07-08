@@ -44,7 +44,7 @@ class CardTableView: UIView {
         static let flyawayDuration = 2.0
     }
     
-    var cards = [Card]()
+    var cards = [SetCard]()
     var cardViews = [SetCardView]()
     var touchDelegate : HandleTouchedCard? = nil
     var gridFrame = CGRect()
@@ -65,7 +65,7 @@ class CardTableView: UIView {
     
     lazy var cardBehavior = CardBehavior(in: animator)
     
-    private func createCardView(forCard theCard: Card) -> SetCardView {
+    private func createCardView(forCard theCard: SetCard) -> SetCardView {
         let cardView = SetCardView()
         cardView.symbol = theCard.symbol
         cardView.shading = theCard.shading
@@ -110,23 +110,23 @@ class CardTableView: UIView {
         }
     }
     
-    private func getCardView(forCard: Card) -> SetCardView? {
+    private func getCardView(forCard: SetCard) -> SetCardView? {
         return cardViews.first(where: {$0.card == forCard})
     }
-    private func getCardViewIndex(forCard: Card) -> Int? {
+    private func getCardViewIndex(forCard: SetCard) -> Int? {
         return cardViews.firstIndex(where: {$0.card == forCard})
     }
-    private func cardIndex(forCard: Card) -> Int? {
+    private func cardIndex(forCard: SetCard) -> Int? {
         return cards.firstIndex(where: {$0 == forCard})
     }
-    func addCardtoTable(forCard: Card) {
+    func addCardtoTable(forCard: SetCard) {
         let newView = createCardView(forCard: forCard)
         
         // TODO: not this simple, need to add at a position
         cardViews.append(newView)
     }
     
-    func addCards(addedCards: [Card]) {
+    func addCards(addedCards: [SetCard]) {
         var cardPos = gridCount
         gridCount += addedCards.count
         layoutIfNeeded()
@@ -140,7 +140,7 @@ class CardTableView: UIView {
         }
     }
     
-    private func flyAwayCard(forCard card: Card, inDirection: CardBehavior.pushDirection) {
+    private func flyAwayCard(forCard card: SetCard, inDirection: CardBehavior.pushDirection) {
         if let flyCard = getCardView(forCard: card)
         {
             cardBehavior.addItem(flyCard, inDirection: inDirection)
@@ -187,7 +187,7 @@ class CardTableView: UIView {
         }
     }
     
-    func removeCards(theseCards removedCards: [Card]) {
+    func removeCards(theseCards removedCards: [SetCard]) {
         var flyDirection: CardBehavior.pushDirection = .left
         var removedViews = [SetCardView]()
         for eachCard in removedCards {
@@ -215,7 +215,7 @@ class CardTableView: UIView {
         //                cardViews.remove(at: removeIndex)
     }
     
-    func showSelectedandHighlighted(forSelected selectedCards: [Card], cardsMatch: Bool){
+    func showSelectedandHighlighted(forSelected selectedCards: [SetCard], cardsMatch: Bool){
         for view in cardViews {
             if selectedCards.contains(view.card!) {
                 view.selected()
@@ -256,7 +256,7 @@ class CardTableView: UIView {
     
     private var cardGrid = Grid(layout: Grid.Layout.aspectRatio(tableConstant.aspectRatio))
     
-    func shuffle(theCards: [Card]) -> [Card] {
+    func shuffle(theCards: [SetCard]) -> [SetCard] {
         //  shuffle the cards and return the shuffled cards using Fisher-Yates algorithm
         var shuffledCards = theCards
         var cardIndex = shuffledCards.count - 1
